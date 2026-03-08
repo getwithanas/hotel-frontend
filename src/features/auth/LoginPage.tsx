@@ -31,7 +31,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setLoading(true);
     try {
-      const response = await authService.login(data);
+      const response = await authService.login(data as LoginRequest);
       setAuth(response.token, response.user);
       toast.success(`Welcome back, ${response.user.name}!`);
       navigate(ROLE_DEFAULT_ROUTE[response.user.role] || '/dashboard');
