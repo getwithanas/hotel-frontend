@@ -275,7 +275,7 @@ export default function OrderDetailPage() {
             <div className="flex items-center justify-between p-4 rounded-lg bg-accent">
               <span className="font-semibold text-foreground">Total</span>
               <span className="text-xl font-bold text-foreground">
-                ${order.totalAmount?.toFixed(2)}
+                ${fmt(order.totalAmount)}
               </span>
             </div>
 
