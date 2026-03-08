@@ -13,6 +13,7 @@ import { Plus, ShoppingCart } from 'lucide-react';
 import type { Order, OrderStatus } from '@/types';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_FLOW } from '@/lib/constants';
 import { toast } from 'sonner';
+import { fmt } from '@/lib/utils';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -117,7 +118,7 @@ export default function OrdersPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge status={item.status} />
-                      <span className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-sm font-medium">${fmt(Number(item.price) * item.quantity)}</span>
                     </div>
                   </div>
                 ))}
@@ -126,7 +127,7 @@ export default function OrdersPage() {
               {/* Total */}
               <div className="flex items-center justify-between p-3 rounded-lg bg-accent">
                 <span className="font-semibold text-foreground">Total</span>
-                <span className="text-lg font-bold text-foreground">${selectedOrder.totalAmount?.toFixed(2)}</span>
+                <span className="text-lg font-bold text-foreground">${fmt(selectedOrder.totalAmount)}</span>
               </div>
 
               {/* Actions */}

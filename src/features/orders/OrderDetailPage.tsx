@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { fmt } from '@/lib/utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersService } from '@/services/orders.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -252,7 +253,7 @@ export default function OrderDetailPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-muted-foreground">×{item.quantity}</span>
                       <span className="text-xs text-muted-foreground">
-                        @ ${item.price.toFixed(2)}
+                        @ ${fmt(item.price)}
                       </span>
                     </div>
                     {item.note && (
@@ -262,7 +263,7 @@ export default function OrderDetailPage() {
                   <div className="flex items-center gap-3 ml-3">
                     <StatusBadge status={item.status} label={ITEM_STATUS_LABELS[item.status]} />
                     <span className="font-semibold text-sm text-foreground whitespace-nowrap">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${fmt(Number(item.price) * item.quantity)}
                     </span>
                   </div>
                 </div>
@@ -274,7 +275,7 @@ export default function OrderDetailPage() {
             <div className="flex items-center justify-between p-4 rounded-lg bg-accent">
               <span className="font-semibold text-foreground">Total</span>
               <span className="text-xl font-bold text-foreground">
-                ${order.totalAmount?.toFixed(2)}
+                ${fmt(order.totalAmount)}
               </span>
             </div>
 
@@ -284,18 +285,18 @@ export default function OrderDetailPage() {
                 <p className="text-sm font-semibold text-foreground">Bill Summary</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-right text-foreground">${order.bill.subtotal.toFixed(2)}</span>
+                  <span className="text-right text-foreground">${fmt(order.bill.subtotal)}</span>
                   <span className="text-muted-foreground">Tax ({order.bill.taxRate}%)</span>
-                  <span className="text-right text-foreground">${order.bill.taxAmount.toFixed(2)}</span>
+                  <span className="text-right text-foreground">${fmt(order.bill.taxAmount)}</span>
                   {order.bill.discount > 0 && (
                     <>
                       <span className="text-muted-foreground">Discount</span>
-                      <span className="text-right text-foreground">-${order.bill.discount.toFixed(2)}</span>
+                      <span className="text-right text-foreground">-${fmt(order.bill.discount)}</span>
                     </>
                   )}
                   <Separator className="col-span-2" />
                   <span className="font-semibold text-foreground">Total</span>
-                  <span className="text-right font-bold text-foreground">${order.bill.total.toFixed(2)}</span>
+                  <span className="text-right font-bold text-foreground">${fmt(order.bill.total)}</span>
                   <span className="text-muted-foreground">Payment</span>
                   <span className="text-right text-foreground capitalize">{order.bill.paymentMethod.toLowerCase()}</span>
                 </div>

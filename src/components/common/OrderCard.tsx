@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn, fmt } from '@/lib/utils';
 import type { Order } from '@/types';
 import { StatusBadge } from './StatusBadge';
 import { ORDER_STATUS_LABELS } from '@/lib/constants';
@@ -72,7 +72,7 @@ export function OrderCard({ order, onClick, compact = false, className }: OrderC
                 <span>{formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}</span>
               </div>
               <span className="font-bold text-foreground">
-                ${order.totalAmount?.toFixed(2)}
+                ${fmt(order.totalAmount)}
               </span>
             </div>
           </>

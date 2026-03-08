@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Minus, Plus, ShoppingCart, Trash2, ArrowLeft, Search, Leaf, ImageIcon, MapPin, Phone, User, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { cn, fmt } from '@/lib/utils';
 import type { MenuItem, OrderType, CreateOrderRequest } from '@/types';
 
 interface CartItem {
@@ -251,7 +251,7 @@ export default function CreateOrderPage() {
                           <Leaf className="h-3 w-3 text-success shrink-0" />
                         )}
                       </div>
-                      <span className="font-bold text-primary text-sm whitespace-nowrap">${item.price.toFixed(2)}</span>
+                      <span className="font-bold text-primary text-sm whitespace-nowrap">${fmt(item.price)}</span>
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-1">{item.description}</p>}
 
@@ -319,7 +319,7 @@ export default function CreateOrderPage() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-foreground truncate">{item.menuItem.name}</p>
-                            <p className="text-xs text-muted-foreground">${item.menuItem.price.toFixed(2)} × {item.quantity}</p>
+                            <p className="text-xs text-muted-foreground">${fmt(item.menuItem.price)} × {item.quantity}</p>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.menuItem.id, -1)}>
@@ -341,7 +341,7 @@ export default function CreateOrderPage() {
                           className="mt-2 h-7 text-xs bg-background"
                         />
                         <div className="text-right mt-1">
-                          <span className="text-sm font-semibold text-foreground">${(item.menuItem.price * item.quantity).toFixed(2)}</span>
+                          <span className="text-sm font-semibold text-foreground">${fmt(Number(item.menuItem.price) * item.quantity)}</span>
                         </div>
                       </motion.div>
                     ))}
@@ -351,7 +351,7 @@ export default function CreateOrderPage() {
                     <div className="flex justify-between text-lg font-bold text-foreground">
                       <span>Total</span>
                       <motion.span key={cartTotal} initial={{ scale: 1.1 }} animate={{ scale: 1 }}>
-                        ${cartTotal.toFixed(2)}
+                        ${fmt(cartTotal)}
                       </motion.span>
                     </div>
                   </div>
