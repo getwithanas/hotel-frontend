@@ -123,6 +123,7 @@ export default function MenuPage() {
     fd.append('categoryId', itemForm.categoryId);
     fd.append('isVeg', itemForm.isVeg.toString());
     fd.append('stock', itemForm.stock || '0');
+    fd.append('spiceLevel', itemForm.spiceLevel || '0');
     if (imageFile) fd.append('image', imageFile);
     createItemMutation.mutate(fd);
   };
