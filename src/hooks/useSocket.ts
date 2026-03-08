@@ -45,10 +45,15 @@ export function useSocket() {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: ['order', String(data.id)] });
+      }
+      const statusLabel = data?.status ? ` to ${data.status}` : '';
+      toast.info(data?.id ? `Order #${data.id} updated${statusLabel}` : 'An order was updated', { duration: 4000 });
       addNotification({
         type: 'order_updated',
         title: 'Order Updated',
-        message: data?.id ? `Order #${data.id} status changed${data.status ? ` to ${data.status}` : ''}` : 'An order was updated',
+        message: data?.id ? `Order #${data.id} status changed${statusLabel}` : 'An order was updated',
       });
     });
 
