@@ -122,8 +122,12 @@ export default function MenuPage() {
   const filteredItems = menuItems?.filter(item => {
     const matchesSearch = !search || item.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'ALL' || item.categoryId.toString() === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesStock = stockFilter === 'ALL' || (stockFilter === 'LOW' && (item.stock ?? 0) > 0 && (item.stock ?? 0) <= LOW_STOCK_THRESHOLD) || (stockFilter === 'OUT' && (item.stock ?? 0) === 0);
+    return matchesSearch && matchesCategory && matchesStock;
   }) || [];
+
+  const lowStockItems = menuItems?.filter(i => (i.stock ?? 0) > 0 && (i.stock ?? 0) <= LOW_STOCK_THRESHOLD) || [];
+  const outOfStockItems = menuItems?.filter(i => (i.stock ?? 0) === 0) || [];
 
   if (menuLoading) return <LoadingSpinner size="lg" />;
 
