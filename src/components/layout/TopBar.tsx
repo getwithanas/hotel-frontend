@@ -14,7 +14,6 @@ import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
-import { formatDistanceToNow } from 'date-fns';
 
 const notifIcon: Record<Notification['type'], React.ElementType> = {
   order_new: ShoppingCart,
