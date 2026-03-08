@@ -44,8 +44,9 @@ export default function TablesPage() {
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: number; status: TableStatus }) => tablesService.updateStatus(id, status),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+      setSelectedTable(prev => prev ? { ...prev, status: variables.status } : null);
       toast.success('Table status updated');
     },
   });
