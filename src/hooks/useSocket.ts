@@ -45,17 +45,26 @@ export function useSocket() {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: ['order', String(data.id)] });
+      }
+      const statusLabel = data?.status ? ` to ${data.status}` : '';
+      toast.info(data?.id ? `Order #${data.id} updated${statusLabel}` : 'An order was updated', { duration: 4000 });
       addNotification({
         type: 'order_updated',
         title: 'Order Updated',
-        message: data?.id ? `Order #${data.id} status changed${data.status ? ` to ${data.status}` : ''}` : 'An order was updated',
+        message: data?.id ? `Order #${data.id} status changed${statusLabel}` : 'An order was updated',
       });
     });
 
     socket.on(SOCKET_EVENTS.ORDER_ITEM_UPDATED, (data?: { orderId?: number }) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
+      if (data?.orderId) {
+        queryClient.invalidateQueries({ queryKey: ['order', String(data.orderId)] });
+      }
       playSuccessSound();
+      toast.success(data?.orderId ? `Item ready in order #${data.orderId}` : 'An order item is ready', { duration: 4000 });
       addNotification({
         type: 'order_ready',
         title: 'Item Ready',
