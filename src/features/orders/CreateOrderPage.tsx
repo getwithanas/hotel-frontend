@@ -13,13 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Minus, Plus, ShoppingCart, Trash2, ArrowLeft, Search, Leaf, ImageIcon, MapPin, Phone, User, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { cn, fmt } from '@/lib/utils';
 import type { MenuItem, OrderType, CreateOrderRequest } from '@/types';
-
-const fmt = (v: unknown): string => {
-  const n = typeof v === 'number' ? v : parseFloat(String(v || '0'));
-  return isNaN(n) ? '0.00' : n.toFixed(2);
-};
 
 interface CartItem {
   menuItem: MenuItem;

@@ -126,7 +126,7 @@ export default function OrdersPage() {
               {/* Total */}
               <div className="flex items-center justify-between p-3 rounded-lg bg-accent">
                 <span className="font-semibold text-foreground">Total</span>
-                <span className="text-lg font-bold text-foreground">${selectedOrder.totalAmount?.toFixed(2)}</span>
+                <span className="text-lg font-bold text-foreground">${fmt(selectedOrder.totalAmount)}</span>
               </div>
 
               {/* Actions */}

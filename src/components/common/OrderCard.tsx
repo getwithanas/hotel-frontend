@@ -72,7 +72,7 @@ export function OrderCard({ order, onClick, compact = false, className }: OrderC
                 <span>{formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}</span>
               </div>
               <span className="font-bold text-foreground">
-                ${order.totalAmount?.toFixed(2)}
+                ${fmt(order.totalAmount)}
               </span>
             </div>
           </>
