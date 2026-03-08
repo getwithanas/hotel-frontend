@@ -19,6 +19,8 @@ import { motion } from 'framer-motion';
 import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
 
+const LOW_STOCK_THRESHOLD = 5;
+
 const cardVariants = {
   hidden: { opacity: 0, y: 12 },
   show: { opacity: 1, y: 0 },
