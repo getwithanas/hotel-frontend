@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { DollarSign, ShoppingCart, BarChart3, TrendingUp } from 'lucide-react';
+import { DollarSign, ShoppingCart, TrendingUp, Printer, Download } from 'lucide-react';
+import { printElement, exportReportAsHTML } from '@/lib/print-utils';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, Legend
@@ -53,17 +54,25 @@ export default function ReportsPage() {
           <div className="filter-bar">
             <Label>Date</Label>
             <Input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)} className="w-[160px]" />
+            <div className="ml-auto flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => printElement('daily-report', `Daily Report - ${dailyDate}`)}>
+                <Printer className="h-4 w-4 mr-1" /> Print
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => exportReportAsHTML('daily-report', `daily-report-${dailyDate}`)}>
+                <Download className="h-4 w-4 mr-1" /> Export
+              </Button>
+            </div>
           </div>
 
           {dailyLoading ? <LoadingSpinner /> : daily && (
-            <>
+            <div id="daily-report">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <StatCard title="Total Bills" value={daily.totalBills} icon={ShoppingCart} />
                 <StatCard title="Revenue" value={`$${daily.totalRevenue.toFixed(2)}`} icon={DollarSign} />
                 <StatCard title="Avg/Bill" value={`$${daily.totalBills > 0 ? (daily.totalRevenue / daily.totalBills).toFixed(2) : '0'}`} icon={TrendingUp} />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
                 <div className="glass-card p-5">
                   <h3 className="text-sm font-semibold text-foreground mb-4">Hourly Orders</h3>
                   <ResponsiveContainer width="100%" height={250}>
@@ -95,7 +104,7 @@ export default function ReportsPage() {
                   </ResponsiveContainer>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </TabsContent>
 
@@ -105,15 +114,23 @@ export default function ReportsPage() {
             <Input type="number" value={monthYear.year} onChange={e => setMonthYear(m => ({ ...m, year: parseInt(e.target.value) }))} className="w-[100px]" />
             <Label>Month</Label>
             <Input type="number" min={1} max={12} value={monthYear.month} onChange={e => setMonthYear(m => ({ ...m, month: parseInt(e.target.value) }))} className="w-[80px]" />
+            <div className="ml-auto flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => printElement('monthly-report', `Monthly Report - ${monthYear.year}/${monthYear.month}`)}>
+                <Printer className="h-4 w-4 mr-1" /> Print
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => exportReportAsHTML('monthly-report', `monthly-report-${monthYear.year}-${monthYear.month}`)}>
+                <Download className="h-4 w-4 mr-1" /> Export
+              </Button>
+            </div>
           </div>
 
           {monthlyLoading ? <LoadingSpinner /> : monthly && (
-            <>
+            <div id="monthly-report">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <StatCard title="Monthly Revenue" value={`$${monthly.totalRevenue.toFixed(2)}`} icon={DollarSign} />
                 <StatCard title="Total Orders" value={monthly.totalOrders} icon={ShoppingCart} />
               </div>
-              <div className="glass-card p-5">
+              <div className="glass-card p-5 mt-4">
                 <h3 className="text-sm font-semibold text-foreground mb-4">Daily Sales</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={monthly.dailySales}>
@@ -125,7 +142,7 @@ export default function ReportsPage() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-            </>
+            </div>
           )}
         </TabsContent>
 
@@ -136,12 +153,22 @@ export default function ReportsPage() {
             <Label>To</Label>
             <Input type="date" value={range.to} onChange={e => setRange(r => ({ ...r, to: e.target.value }))} className="w-[160px]" />
             <Button onClick={() => fetchRange()} disabled={!range.from || !range.to}>Apply</Button>
+            {rangeData && (
+              <div className="ml-auto flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => printElement('range-report', `Report ${range.from} to ${range.to}`)}>
+                  <Printer className="h-4 w-4 mr-1" /> Print
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => exportReportAsHTML('range-report', `range-report-${range.from}-${range.to}`)}>
+                  <Download className="h-4 w-4 mr-1" /> Export
+                </Button>
+              </div>
+            )}
           </div>
 
           {rangeLoading ? <LoadingSpinner /> : rangeData && (
-            <>
+            <div id="range-report">
               <StatCard title="Total Revenue" value={`$${rangeData.totalRevenue.toFixed(2)}`} icon={DollarSign} className="max-w-sm" />
-              <div className="glass-card p-5">
+              <div className="glass-card p-5 mt-4">
                 <h3 className="text-sm font-semibold text-foreground mb-4">Revenue by Category</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={rangeData.revenueByCategory}>
@@ -153,7 +180,7 @@ export default function ReportsPage() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </>
+            </div>
           )}
         </TabsContent>
       </Tabs>
