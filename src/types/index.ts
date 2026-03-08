@@ -99,6 +99,9 @@ export interface MenuItem {
   image?: string;
   isVeg: boolean;
   available: boolean;
+  stock: number;
+  spiceLevel?: number;
+  sortOrder?: number;
   categoryId: number;
   category?: Category;
   createdAt: string;

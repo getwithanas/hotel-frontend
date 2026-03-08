@@ -316,9 +316,15 @@ export default function MenuPage() {
                 </Select>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={itemForm.isVeg} onCheckedChange={v => setItemForm(f => ({ ...f, isVeg: v }))} />
-              <Label>Vegetarian</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-2">
+                <Switch checked={itemForm.isVeg} onCheckedChange={v => setItemForm(f => ({ ...f, isVeg: v }))} />
+                <Label>Vegetarian</Label>
+              </div>
+              <div className="space-y-2">
+                <Label>Stock</Label>
+                <Input type="number" min="0" value={itemForm.stock} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" />
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Image</Label>
