@@ -111,6 +111,7 @@ export default function MenuPage() {
     fd.append('price', itemForm.price);
     fd.append('categoryId', itemForm.categoryId);
     fd.append('isVeg', itemForm.isVeg.toString());
+    fd.append('stock', itemForm.stock || '0');
     if (imageFile) fd.append('image', imageFile);
     createItemMutation.mutate(fd);
   };
