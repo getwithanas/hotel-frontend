@@ -33,7 +33,7 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false });
+  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '' });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
 
@@ -95,10 +95,10 @@ export default function MenuPage() {
   const openItemDialog = (item?: MenuItem) => {
     if (item) {
       setEditingItem(item);
-      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg });
+      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg, stock: (item.stock ?? 0).toString() });
     } else {
       setEditingItem(null);
-      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false });
+      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '' });
     }
     setImageFile(null);
     setShowItemDialog(true);
@@ -111,6 +111,7 @@ export default function MenuPage() {
     fd.append('price', itemForm.price);
     fd.append('categoryId', itemForm.categoryId);
     fd.append('isVeg', itemForm.isVeg.toString());
+    fd.append('stock', itemForm.stock || '0');
     if (imageFile) fd.append('image', imageFile);
     createItemMutation.mutate(fd);
   };
@@ -205,7 +206,12 @@ export default function MenuPage() {
                       <span className="font-bold text-primary text-sm whitespace-nowrap">${fmt(item.price)}</span>
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
-                    <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                      <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', item.stock > 0 ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive')}>
+                        Stock: {item.stock ?? 0}
+                      </span>
+                    </div>
 
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                       <div className="flex items-center gap-2">
@@ -310,9 +316,15 @@ export default function MenuPage() {
                 </Select>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={itemForm.isVeg} onCheckedChange={v => setItemForm(f => ({ ...f, isVeg: v }))} />
-              <Label>Vegetarian</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-2">
+                <Switch checked={itemForm.isVeg} onCheckedChange={v => setItemForm(f => ({ ...f, isVeg: v }))} />
+                <Label>Vegetarian</Label>
+              </div>
+              <div className="space-y-2">
+                <Label>Stock</Label>
+                <Input type="number" min="0" value={itemForm.stock} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" />
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Image</Label>
