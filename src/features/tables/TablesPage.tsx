@@ -102,7 +102,7 @@ export default function TablesPage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Table Number</Label>
-              <Input type="number" value={createForm.number} onChange={e => setCreateForm(f => ({ ...f, number: parseInt(e.target.value) || 1 }))} />
+              <Input type="number" value={createForm.number} onChange={e => setCreateForm(f => ({ ...f, number: e.target.value }))} />
             </div>
             <div className="space-y-2">
               <Label>Capacity</Label>
