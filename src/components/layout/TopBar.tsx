@@ -1,7 +1,11 @@
 import { useAuthStore } from '@/store/auth-store';
 import { useNotificationStore, type Notification } from '@/store/notification-store';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { Bell, Sun, Moon, ShoppingCart, ChefHat, Table2, Receipt, Truck, CheckCheck, Trash2 } from 'lucide-react';
+import {
+  Bell, Sun, Moon, ShoppingCart, ChefHat, Table2, Receipt, Truck,
+  CheckCheck, Trash2, LogOut, Settings, User, BarChart3, ChevronDown
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
