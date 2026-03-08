@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { TopBar } from './TopBar';
+import { MobileBottomNav } from './MobileBottomNav';
 import { useAuthStore } from '@/store/auth-store';
 import { useSocket } from '@/hooks/useSocket';
 import { authService } from '@/services/auth.service';
