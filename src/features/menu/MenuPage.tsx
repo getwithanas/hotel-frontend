@@ -4,21 +4,20 @@ import { menuService } from '@/services/menu.service';
 import { categoriesService } from '@/services/categories.service';
 import { settingsService } from '@/services/settings.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { MenuItemImage } from '@/components/common/MenuItemImage';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon, AlertTriangle, Flame } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, Edit, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
+
+import { MenuItemCard } from './components/MenuItemCard';
+import { MenuItemDialog } from './components/MenuItemDialog';
+import { CategoryDialog } from './components/CategoryDialog';
+import { LowStockBanner } from './components/LowStockBanner';
 
 const DEFAULT_LOW_STOCK_THRESHOLD = 5;
 
@@ -37,10 +36,7 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '', spiceLevel: '0' });
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
-
+  // ── Queries ──
   const { data: menuItems, isLoading: menuLoading } = useQuery({
     queryKey: ['menu'],
     queryFn: () => menuService.list(),
@@ -58,6 +54,7 @@ export default function MenuPage() {
 
   const LOW_STOCK_THRESHOLD = Number(settings?.lowStockThreshold) || DEFAULT_LOW_STOCK_THRESHOLD;
 
+  // ── Mutations ──
   const createItemMutation = useMutation({
     mutationFn: (data: FormData) => editingItem ? menuService.update(editingItem.id, data) : menuService.create(data),
     onSuccess: () => {
@@ -103,31 +100,7 @@ export default function MenuPage() {
     },
   });
 
-  const openItemDialog = (item?: MenuItem) => {
-    if (item) {
-      setEditingItem(item);
-      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg, stock: (item.stock ?? 0).toString(), spiceLevel: (item.spiceLevel ?? 0).toString() });
-    } else {
-      setEditingItem(null);
-      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '', spiceLevel: '0' });
-    }
-    setImageFile(null);
-    setShowItemDialog(true);
-  };
-
-  const handleItemSubmit = () => {
-    const fd = new FormData();
-    fd.append('name', itemForm.name);
-    fd.append('description', itemForm.description);
-    fd.append('price', itemForm.price);
-    fd.append('categoryId', itemForm.categoryId);
-    fd.append('isVeg', itemForm.isVeg.toString());
-    fd.append('stock', itemForm.stock || '0');
-    fd.append('spiceLevel', itemForm.spiceLevel || '0');
-    if (imageFile) fd.append('image', imageFile);
-    createItemMutation.mutate(fd);
-  };
-
+  // ── Derived data ──
   const filteredItems = menuItems?.filter(item => {
     const matchesSearch = !search || item.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'ALL' || item.categoryId.toString() === categoryFilter;
@@ -137,6 +110,11 @@ export default function MenuPage() {
 
   const lowStockItems = menuItems?.filter(i => (i.stock ?? 0) > 0 && (i.stock ?? 0) <= LOW_STOCK_THRESHOLD) || [];
   const outOfStockItems = menuItems?.filter(i => (i.stock ?? 0) === 0) || [];
+
+  const openItemDialog = (item?: MenuItem) => {
+    setEditingItem(item ?? null);
+    setShowItemDialog(true);
+  };
 
   if (menuLoading) return <LoadingSpinner size="lg" />;
 
@@ -161,25 +139,7 @@ export default function MenuPage() {
         </TabsList>
 
         <TabsContent value="items" className="space-y-4 mt-4">
-          {/* Low stock warning banner */}
-          {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
-            <div className="flex items-start gap-3 p-3 rounded-lg border border-warning/30 bg-warning/5">
-              <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-              <div className="text-sm">
-                {outOfStockItems.length > 0 && (
-                  <p className="text-destructive font-medium">
-                    {outOfStockItems.length} item{outOfStockItems.length > 1 ? 's' : ''} out of stock
-                  </p>
-                )}
-                {lowStockItems.length > 0 && (
-                  <p className="text-warning-foreground">
-                    {lowStockItems.length} item{lowStockItems.length > 1 ? 's' : ''} running low (≤{LOW_STOCK_THRESHOLD}):{' '}
-                    <span className="font-medium">{lowStockItems.map(i => `${i.name} (${i.stock})`).join(', ')}</span>
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+          <LowStockBanner lowStockItems={lowStockItems} outOfStockItems={outOfStockItems} threshold={LOW_STOCK_THRESHOLD} />
 
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 flex-1 flex-wrap">
@@ -216,85 +176,14 @@ export default function MenuPage() {
               variants={{ show: { transition: { staggerChildren: 0.05 } } }}
             >
               {filteredItems.map(item => (
-                <motion.div
+                <MenuItemCard
                   key={item.id}
-                  className="bg-card border border-border rounded-xl overflow-hidden group"
-                  style={{ boxShadow: 'var(--shadow-sm)' }}
-                  variants={cardVariants}
-                  whileHover={{ y: -3, boxShadow: '0 8px 20px -8px hsl(var(--primary) / 0.1)' }}
-                >
-                  {/* Image */}
-                  <div className="h-36 bg-muted/50 flex items-center justify-center overflow-hidden relative">
-                    {item.image ? (
-                      <MenuItemImage src={item.image} alt={item.name} className="w-full h-full" />
-                    ) : (
-                      <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
-                    )}
-                    {/* Veg badge overlay */}
-                    {item.isVeg && (
-                      <span className="absolute top-2 left-2 flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md bg-success/90 text-success-foreground font-medium">
-                        <Leaf className="h-2.5 w-2.5" /> VEG
-                      </span>
-                    )}
-                    {/* Availability overlay */}
-                    {!item.available && (
-                      <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
-                        <span className="text-xs font-semibold text-muted-foreground bg-background/80 px-3 py-1 rounded-full">Unavailable</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h4 className="font-semibold text-foreground text-sm leading-tight">{item.name}</h4>
-                      <span className="font-bold text-primary text-sm whitespace-nowrap">${fmt(item.price)}</span>
-                    </div>
-                    {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
-                      {(item.spiceLevel ?? 0) > 0 && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive flex items-center gap-0.5">
-                          {Array.from({ length: item.spiceLevel! }).map((_, i) => (
-                            <Flame key={i} className="h-2.5 w-2.5" />
-                          ))}
-                        </span>
-                      )}
-                      {(item.stock ?? 0) === 0 ? (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive animate-pulse">
-                          Out of Stock
-                        </span>
-                      ) : (item.stock ?? 0) <= LOW_STOCK_THRESHOLD ? (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-warning/15 text-warning-foreground">
-                          ⚠ Low: {item.stock}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-success/10 text-success">
-                          Stock: {item.stock}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={item.available}
-                          onCheckedChange={() => toggleMutation.mutate(item.id)}
-                        />
-                        <span className={cn('text-xs', item.available ? 'text-success' : 'text-muted-foreground')}>
-                          {item.available ? 'Available' : 'Off'}
-                        </span>
-                      </div>
-                      <div className="flex gap-0.5">
-                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openItemDialog(item)}>
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteItemMutation.mutate(item.id)}>
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                  item={item}
+                  lowStockThreshold={LOW_STOCK_THRESHOLD}
+                  onEdit={openItemDialog}
+                  onDelete={id => deleteItemMutation.mutate(id)}
+                  onToggle={id => toggleMutation.mutate(id)}
+                />
               ))}
             </motion.div>
           ) : (
@@ -304,7 +193,7 @@ export default function MenuPage() {
 
         <TabsContent value="categories" className="space-y-4 mt-4">
           <div className="flex justify-end">
-            <Button onClick={() => { setEditingCategory(null); setCategoryForm({ name: '', description: '' }); setShowCategoryDialog(true); }}>
+            <Button onClick={() => { setEditingCategory(null); setShowCategoryDialog(true); }}>
               <Plus className="h-4 w-4 mr-1" /> Add Category
             </Button>
           </div>
@@ -331,7 +220,6 @@ export default function MenuPage() {
                   <div className="flex gap-0.5">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => {
                       setEditingCategory(cat);
-                      setCategoryForm({ name: cat.name, description: cat.description || '' });
                       setShowCategoryDialog(true);
                     }}><Edit className="h-3 w-3" /></Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteCategoryMutation.mutate(cat.id)}>
@@ -347,107 +235,23 @@ export default function MenuPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Item Dialog */}
-      <Dialog open={showItemDialog} onOpenChange={setShowItemDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingItem ? 'Edit' : 'Add'} Menu Item</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input value={itemForm.name} onChange={e => setItemForm(f => ({ ...f, name: e.target.value }))} />
-            </div>
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea value={itemForm.description} onChange={e => setItemForm(f => ({ ...f, description: e.target.value }))} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Price</Label>
-                <Input type="number" step="0.01" value={itemForm.price} onChange={e => setItemForm(f => ({ ...f, price: e.target.value }))} />
-              </div>
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <Select value={itemForm.categoryId} onValueChange={v => setItemForm(f => ({ ...f, categoryId: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    {categories?.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-2">
-                <Switch checked={itemForm.isVeg} onCheckedChange={v => setItemForm(f => ({ ...f, isVeg: v }))} />
-                <Label>Vegetarian</Label>
-              </div>
-              <div className="space-y-2">
-                <Label>Spice Level</Label>
-                <div className="flex items-center gap-1">
-                  {[0, 1, 2, 3, 4, 5].map(level => (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={() => setItemForm(f => ({ ...f, spiceLevel: level.toString() }))}
-                      className={cn(
-                        'h-8 w-8 rounded-md flex items-center justify-center text-xs font-medium transition-colors border',
-                        Number(itemForm.spiceLevel) >= level && level > 0
-                          ? 'bg-destructive/15 border-destructive/30 text-destructive'
-                          : 'bg-muted border-border text-muted-foreground hover:bg-muted/80'
-                      )}
-                      title={level === 0 ? 'No spice' : `Level ${level}`}
-                    >
-                      {level === 0 ? '0' : <Flame className="h-3.5 w-3.5" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Stock</Label>
-                <Input type="number" min="0" value={itemForm.stock} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Image</Label>
-              <Input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] || null)} />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowItemDialog(false)}>Cancel</Button>
-            <Button onClick={handleItemSubmit} disabled={createItemMutation.isPending}>
-              {editingItem ? 'Update' : 'Create'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Dialogs */}
+      <MenuItemDialog
+        open={showItemDialog}
+        onOpenChange={setShowItemDialog}
+        editingItem={editingItem}
+        categories={categories || []}
+        isPending={createItemMutation.isPending}
+        onSubmit={fd => createItemMutation.mutate(fd)}
+      />
 
-      {/* Category Dialog */}
-      <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingCategory ? 'Edit' : 'Add'} Category</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input value={categoryForm.name} onChange={e => setCategoryForm(f => ({ ...f, name: e.target.value }))} />
-            </div>
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea value={categoryForm.description} onChange={e => setCategoryForm(f => ({ ...f, description: e.target.value }))} />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCategoryDialog(false)}>Cancel</Button>
-            <Button onClick={() => createCategoryMutation.mutate(categoryForm)} disabled={createCategoryMutation.isPending}>
-              {editingCategory ? 'Update' : 'Create'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <CategoryDialog
+        open={showCategoryDialog}
+        onOpenChange={setShowCategoryDialog}
+        editingCategory={editingCategory}
+        isPending={createCategoryMutation.isPending}
+        onSubmit={data => createCategoryMutation.mutate(data)}
+      />
     </div>
   );
 }
