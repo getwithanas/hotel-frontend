@@ -106,10 +106,10 @@ export default function MenuPage() {
   const openItemDialog = (item?: MenuItem) => {
     if (item) {
       setEditingItem(item);
-      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg, stock: (item.stock ?? 0).toString() });
+      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg, stock: (item.stock ?? 0).toString(), spiceLevel: (item.spiceLevel ?? 0).toString() });
     } else {
       setEditingItem(null);
-      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '' });
+      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '', spiceLevel: '0' });
     }
     setImageFile(null);
     setShowItemDialog(true);
