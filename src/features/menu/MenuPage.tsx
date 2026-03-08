@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon, AlertTriangle } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon, AlertTriangle, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
