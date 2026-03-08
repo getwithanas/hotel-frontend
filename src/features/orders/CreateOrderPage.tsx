@@ -8,11 +8,12 @@ import { ordersService } from '@/services/orders.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Minus, Plus, ShoppingCart, Trash2, ArrowLeft, Search } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Trash2, ArrowLeft, Search, Leaf, ImageIcon, MapPin, Phone, User, Send } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import type { MenuItem, OrderType, CreateOrderRequest } from '@/types';
 
 interface CartItem {
@@ -85,7 +86,12 @@ export default function CreateOrderPage() {
     );
   };
 
+  const updateNote = (itemId: number, note: string) => {
+    setCart(prev => prev.map(c => c.menuItem.id === itemId ? { ...c, note } : c));
+  };
+
   const cartTotal = cart.reduce((sum, c) => sum + c.menuItem.price * c.quantity, 0);
+  const cartItemCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
   const handleSubmit = () => {
     if (cart.length === 0) { toast.error('Add items to the order'); return; }
@@ -107,10 +113,10 @@ export default function CreateOrderPage() {
   if (menuLoading) return <LoadingSpinner size="lg" />;
 
   return (
-    <div className="animate-fade-in">
+    <div>
       <div className="page-header">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -120,22 +126,30 @@ export default function CreateOrderPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Menu */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
+        {/* Menu Section */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Order config */}
-          <div className="filter-bar">
-            <Select value={orderType} onValueChange={(v) => setOrderType(v as OrderType)}>
-              <SelectTrigger className="w-[130px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="DINE_IN">Dine In</SelectItem>
-                <SelectItem value="TAKEAWAY">Takeaway</SelectItem>
-                <SelectItem value="DELIVERY">Delivery</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Order type selector */}
+          <div className="bg-card border border-border rounded-xl p-3 flex flex-wrap items-center gap-3" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="flex rounded-lg bg-muted p-0.5">
+              {(['DINE_IN', 'TAKEAWAY', 'DELIVERY'] as OrderType[]).map(type => (
+                <button
+                  key={type}
+                  className={cn(
+                    'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
+                    orderType === type
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                  onClick={() => setOrderType(type)}
+                >
+                  {type.replace('_', ' ')}
+                </button>
+              ))}
+            </div>
             {orderType === 'DINE_IN' && (
               <Select value={tableId} onValueChange={setTableId}>
-                <SelectTrigger className="w-[130px]"><SelectValue placeholder="Select table" /></SelectTrigger>
+                <SelectTrigger className="w-[140px] h-8"><SelectValue placeholder="Select table" /></SelectTrigger>
                 <SelectContent>
                   {tables?.filter(t => t.status === 'FREE' || t.id.toString() === tableId).map(t => (
                     <SelectItem key={t.id} value={t.id.toString()}>Table {t.number}</SelectItem>
@@ -146,20 +160,36 @@ export default function CreateOrderPage() {
           </div>
 
           {/* Delivery info */}
-          {orderType === 'DELIVERY' && (
-            <div className="glass-card p-4 space-y-3">
-              <p className="text-sm font-semibold text-foreground">Delivery Details</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Input placeholder="Customer Name" value={deliveryInfo.customerName} onChange={e => setDeliveryInfo(d => ({ ...d, customerName: e.target.value }))} />
-                <Input placeholder="Phone" value={deliveryInfo.phone} onChange={e => setDeliveryInfo(d => ({ ...d, phone: e.target.value }))} />
-              </div>
-              <Textarea placeholder="Delivery Address" value={deliveryInfo.address} onChange={e => setDeliveryInfo(d => ({ ...d, address: e.target.value }))} />
-            </div>
-          )}
+          <AnimatePresence>
+            {orderType === 'DELIVERY' && (
+              <motion.div
+                className="bg-card border border-border rounded-xl p-4 space-y-3"
+                style={{ boxShadow: 'var(--shadow-sm)' }}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" /> Delivery Details
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input className="pl-9" placeholder="Customer Name" value={deliveryInfo.customerName} onChange={e => setDeliveryInfo(d => ({ ...d, customerName: e.target.value }))} />
+                  </div>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input className="pl-9" placeholder="Phone" value={deliveryInfo.phone} onChange={e => setDeliveryInfo(d => ({ ...d, phone: e.target.value }))} />
+                  </div>
+                </div>
+                <Textarea placeholder="Delivery Address" value={deliveryInfo.address} onChange={e => setDeliveryInfo(d => ({ ...d, address: e.target.value }))} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Menu search/filter */}
-          <div className="filter-bar">
-            <div className="relative flex-1 min-w-[200px]">
+          {/* Search and category filter */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search menu..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
             </div>
@@ -175,79 +205,158 @@ export default function CreateOrderPage() {
           </div>
 
           {/* Menu grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"
+            initial="hidden"
+            animate="show"
+            variants={{ show: { transition: { staggerChildren: 0.03 } } }}
+          >
             {filteredMenu.map(item => {
               const inCart = cart.find(c => c.menuItem.id === item.id);
               return (
-                <div key={item.id} className="glass-card p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-foreground text-sm">{item.name}</span>
-                      {item.isVeg && <span className="text-[10px] px-1.5 py-0.5 rounded bg-success/15 text-success font-medium">VEG</span>}
+                <motion.div
+                  key={item.id}
+                  className={cn(
+                    'bg-card border rounded-xl overflow-hidden transition-colors',
+                    inCart ? 'border-primary/40 ring-1 ring-primary/10' : 'border-border'
+                  )}
+                  style={{ boxShadow: 'var(--shadow-sm)' }}
+                  variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+                  whileHover={{ y: -2 }}
+                >
+                  {/* Image area */}
+                  {item.image ? (
+                    <div className="h-28 bg-muted overflow-hidden">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
-                    {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="font-bold text-foreground">${item.price.toFixed(2)}</span>
-                    {inCart ? (
-                      <div className="flex items-center gap-2">
-                        <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => updateQuantity(item.id, -1)}>
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="text-sm font-semibold w-5 text-center">{inCart.quantity}</span>
-                        <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => updateQuantity(item.id, 1)}>
-                          <Plus className="h-3 w-3" />
-                        </Button>
+                  ) : null}
+
+                  <div className="p-3">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-foreground text-sm">{item.name}</span>
+                        {item.isVeg && (
+                          <Leaf className="h-3 w-3 text-success shrink-0" />
+                        )}
                       </div>
-                    ) : (
-                      <Button size="sm" variant="outline" onClick={() => addToCart(item)}>
-                        <Plus className="h-3 w-3 mr-1" /> Add
-                      </Button>
-                    )}
+                      <span className="font-bold text-primary text-sm whitespace-nowrap">${item.price.toFixed(2)}</span>
+                    </div>
+                    {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-1">{item.description}</p>}
+
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                      {inCart ? (
+                        <div className="flex items-center gap-1.5">
+                          <Button size="icon" variant="outline" className="h-6 w-6 rounded-md" onClick={() => updateQuantity(item.id, -1)}>
+                            <Minus className="h-2.5 w-2.5" />
+                          </Button>
+                          <motion.span
+                            key={inCart.quantity}
+                            className="text-sm font-bold w-5 text-center text-primary"
+                            initial={{ scale: 1.3 }}
+                            animate={{ scale: 1 }}
+                          >
+                            {inCart.quantity}
+                          </motion.span>
+                          <Button size="icon" variant="outline" className="h-6 w-6 rounded-md" onClick={() => updateQuantity(item.id, 1)}>
+                            <Plus className="h-2.5 w-2.5" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => addToCart(item)}>
+                          <Plus className="h-3 w-3 mr-0.5" /> Add
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
 
-        {/* Cart */}
+        {/* Cart sidebar */}
         <div className="lg:col-span-1">
-          <div className="glass-card p-5 sticky top-4">
-            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Cart ({cart.length} items)
-            </h3>
+          <div className="bg-card border border-border rounded-xl sticky top-4 overflow-hidden" style={{ boxShadow: 'var(--shadow-md)' }}>
+            {/* Cart header */}
+            <div className="p-4 border-b border-border bg-muted/30">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 text-primary" />
+                Cart
+                {cartItemCount > 0 && (
+                  <span className="ml-auto text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5">
+                    {cartItemCount}
+                  </span>
+                )}
+              </h3>
+            </div>
 
-            {cart.length > 0 ? (
-              <div className="space-y-3">
-                {cart.map(item => (
-                  <div key={item.menuItem.id} className="flex items-center justify-between p-2 rounded-lg bg-muted">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{item.menuItem.name}</p>
-                      <p className="text-xs text-muted-foreground">${item.menuItem.price.toFixed(2)} × {item.quantity}</p>
-                    </div>
-                    <div className="flex items-center gap-1 ml-2">
-                      <span className="text-sm font-semibold">${(item.menuItem.price * item.quantity).toFixed(2)}</span>
-                      <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => updateQuantity(item.menuItem.id, -item.quantity)}>
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+            <div className="p-4">
+              {cart.length > 0 ? (
+                <div className="space-y-2">
+                  <AnimatePresence>
+                    {cart.map(item => (
+                      <motion.div
+                        key={item.menuItem.id}
+                        className="rounded-lg bg-muted/50 border border-border p-3"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20, height: 0, marginBottom: 0 }}
+                        layout
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{item.menuItem.name}</p>
+                            <p className="text-xs text-muted-foreground">${item.menuItem.price.toFixed(2)} × {item.quantity}</p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.menuItem.id, -1)}>
+                              <Minus className="h-2.5 w-2.5" />
+                            </Button>
+                            <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.menuItem.id, 1)}>
+                              <Plus className="h-2.5 w-2.5" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => updateQuantity(item.menuItem.id, -item.quantity)}>
+                              <Trash2 className="h-2.5 w-2.5" />
+                            </Button>
+                          </div>
+                        </div>
+                        <Input
+                          placeholder="Add note..."
+                          value={item.note}
+                          onChange={e => updateNote(item.menuItem.id, e.target.value)}
+                          className="mt-2 h-7 text-xs bg-background"
+                        />
+                        <div className="text-right mt-1">
+                          <span className="text-sm font-semibold text-foreground">${(item.menuItem.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+
+                  <div className="border-t border-border pt-3 mt-3">
+                    <div className="flex justify-between text-lg font-bold text-foreground">
+                      <span>Total</span>
+                      <motion.span key={cartTotal} initial={{ scale: 1.1 }} animate={{ scale: 1 }}>
+                        ${cartTotal.toFixed(2)}
+                      </motion.span>
                     </div>
                   </div>
-                ))}
-                <div className="border-t border-border pt-3">
-                  <div className="flex justify-between text-lg font-bold text-foreground">
-                    <span>Total</span>
-                    <span>${cartTotal.toFixed(2)}</span>
-                  </div>
+
+                  <Button className="w-full mt-3" size="lg" onClick={handleSubmit} disabled={createMutation.isPending}>
+                    <Send className="h-4 w-4 mr-2" />
+                    Place Order
+                  </Button>
                 </div>
-                <Button className="w-full" onClick={handleSubmit} disabled={createMutation.isPending}>
-                  Place Order
-                </Button>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">No items added yet</p>
-            )}
+              ) : (
+                <div className="text-center py-10">
+                  <ShoppingCart className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No items added yet</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">Browse the menu and add items</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
