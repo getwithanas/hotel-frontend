@@ -3,6 +3,7 @@ import type { RestaurantTable } from '@/types';
 import { TABLE_STATUS_LABELS } from '@/lib/constants';
 import { StatusBadge } from './StatusBadge';
 import { Users, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 import tableFreeImg from '@/assets/table-free.png';
 import tableOccupiedImg from '@/assets/table-occupied.png';
 import tableReservedImg from '@/assets/table-reserved.png';
@@ -11,6 +12,12 @@ const statusImage: Record<string, string> = {
   FREE: tableFreeImg,
   OCCUPIED: tableOccupiedImg,
   RESERVED: tableReservedImg,
+};
+
+const glowColor: Record<string, string> = {
+  FREE: 'hsl(var(--status-free) / 0.35)',
+  OCCUPIED: 'hsl(var(--status-occupied) / 0.35)',
+  RESERVED: 'hsl(var(--status-reserved) / 0.35)',
 };
 
 interface TableCardProps {
@@ -26,30 +33,47 @@ export function TableCard({ table, onClick }: TableCardProps) {
   }[table.status];
 
   return (
-    <div
+    <motion.div
       className={cn(
-        'table-card group relative flex flex-col items-center rounded-2xl border-2 p-4 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1',
+        'table-card group relative flex flex-col items-center rounded-2xl border-2 p-4 cursor-pointer',
         statusClass
       )}
       onClick={() => onClick?.(table)}
       role="button"
       tabIndex={0}
+      whileHover={{
+        y: -6,
+        boxShadow: `0 12px 28px -6px ${glowColor[table.status]}, 0 4px 12px -4px ${glowColor[table.status]}`,
+        transition: { type: 'spring', stiffness: 350, damping: 20 },
+      }}
+      whileTap={{ scale: 0.97 }}
     >
       {/* Active orders badge */}
       {table.activeOrders && table.activeOrders.length > 0 && (
-        <span className="absolute -top-2 -right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-md ring-2 ring-background">
+        <motion.span
+          className="absolute -top-2 -right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-md ring-2 ring-background"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+        >
           {table.activeOrders.length}
-        </span>
+        </motion.span>
       )}
 
-      {/* Illustration */}
-      <div className="relative w-24 h-24 mb-2 flex items-center justify-center">
+      {/* Illustration with bounce */}
+      <motion.div
+        className="relative w-24 h-24 mb-2 flex items-center justify-center"
+        whileHover={{
+          y: [0, -6, 0],
+          transition: { duration: 0.6, ease: 'easeInOut', repeat: Infinity },
+        }}
+      >
         <img
           src={statusImage[table.status]}
           alt={`Table ${table.number} - ${TABLE_STATUS_LABELS[table.status]}`}
-          className="w-full h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-contain drop-shadow-md"
         />
-      </div>
+      </motion.div>
 
       {/* Table number */}
       <span className="text-base font-bold text-foreground tracking-tight">
@@ -74,6 +98,6 @@ export function TableCard({ table, onClick }: TableCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
