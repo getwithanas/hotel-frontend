@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersService } from '@/services/orders.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -5,14 +6,23 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { ITEM_STATUS_LABELS, ORDER_STATUS_LABELS } from '@/lib/constants';
-import { ChefHat, Clock, CheckCircle2 } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { isMuted, setMuted } from '@/lib/notification-sound';
 import type { OrderItemStatus } from '@/types';
 
 export default function KitchenDisplayPage() {
   const queryClient = useQueryClient();
+  const [soundMuted, setSoundMuted] = useState(isMuted());
+
+  const toggleMute = () => {
+    const newVal = !soundMuted;
+    setSoundMuted(newVal);
+    setMuted(newVal);
+    toast.info(newVal ? 'Sounds muted' : 'Sounds enabled');
+  };
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ['kitchen-orders'],
@@ -52,7 +62,16 @@ export default function KitchenDisplayPage() {
             <p className="page-subtitle">{orders?.length || 0} active orders</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn('h-9 w-9', soundMuted ? 'text-muted-foreground' : 'text-foreground')}
+            onClick={toggleMute}
+            title={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
+          >
+            {soundMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </Button>
           <span className="animate-pulse-dot h-2 w-2 rounded-full bg-success" />
           <span className="text-xs text-muted-foreground">Live</span>
         </div>

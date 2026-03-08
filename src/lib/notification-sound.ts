@@ -3,6 +3,16 @@
  */
 
 let audioCtx: AudioContext | null = null;
+let muted = localStorage.getItem('kitchen_muted') === 'true';
+
+export function isMuted(): boolean {
+  return muted;
+}
+
+export function setMuted(value: boolean) {
+  muted = value;
+  localStorage.setItem('kitchen_muted', String(value));
+}
 
 function getAudioContext(): AudioContext {
   if (!audioCtx) {
@@ -13,6 +23,7 @@ function getAudioContext(): AudioContext {
 
 /** Play a two-tone chime for new orders (kitchen alert) */
 export function playNewOrderSound() {
+  if (muted) return;
   try {
     const ctx = getAudioContext();
     const now = ctx.currentTime;
@@ -46,6 +57,7 @@ export function playNewOrderSound() {
 
 /** Play a short success beep (item ready, bill generated) */
 export function playSuccessSound() {
+  if (muted) return;
   try {
     const ctx = getAudioContext();
     const now = ctx.currentTime;
