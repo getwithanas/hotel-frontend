@@ -206,7 +206,12 @@ export default function MenuPage() {
                       <span className="font-bold text-primary text-sm whitespace-nowrap">${fmt(item.price)}</span>
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
-                    <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                      <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', item.stock > 0 ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive')}>
+                        Stock: {item.stock ?? 0}
+                      </span>
+                    </div>
 
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                       <div className="flex items-center gap-2">
