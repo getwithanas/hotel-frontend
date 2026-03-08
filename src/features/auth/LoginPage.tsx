@@ -232,7 +232,7 @@ export default function LoginPage() {
               >
                 Password
               </Label>
-              <div className={`rounded-xl transition-shadow duration-200 ${
+              <div className={`relative rounded-xl transition-shadow duration-200 ${
                 focused === 'password' ? 'ring-2 ring-primary/20 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.15)]' : ''
               }`}>
                 <Input
@@ -249,7 +249,6 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5"
                   tabIndex={-1}
-                  style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)' }}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
