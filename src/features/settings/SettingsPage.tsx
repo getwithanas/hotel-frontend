@@ -77,6 +77,32 @@ export default function SettingsPage() {
           <Save className="h-4 w-4 mr-1" /> Save Settings
         </Button>
       </div>
+
+      {/* Appearance */}
+      <div className="glass-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Appearance</h2>
+        <div className="space-y-2">
+          <Label>Theme</Label>
+          <div className="flex gap-2">
+            {([
+              { value: 'light', icon: Sun, label: 'Light' },
+              { value: 'dark', icon: Moon, label: 'Dark' },
+              { value: 'system', icon: Monitor, label: 'System' },
+            ] as const).map(({ value, icon: Icon, label }) => (
+              <Button
+                key={value}
+                variant={theme === value ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTheme(value)}
+                className="flex items-center gap-1.5"
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
