@@ -10,6 +10,7 @@ import DashboardPage from "@/features/dashboard/DashboardPage";
 import TablesPage from "@/features/tables/TablesPage";
 import OrdersPage from "@/features/orders/OrdersPage";
 import CreateOrderPage from "@/features/orders/CreateOrderPage";
+import OrderDetailPage from "@/features/orders/OrderDetailPage";
 import KitchenDisplayPage from "@/features/kitchen/KitchenDisplayPage";
 import MenuPage from "@/features/menu/MenuPage";
 import BillingPage from "@/features/billing/BillingPage";
