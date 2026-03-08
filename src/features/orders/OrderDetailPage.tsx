@@ -263,7 +263,7 @@ export default function OrderDetailPage() {
                   <div className="flex items-center gap-3 ml-3">
                     <StatusBadge status={item.status} label={ITEM_STATUS_LABELS[item.status]} />
                     <span className="font-semibold text-sm text-foreground whitespace-nowrap">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${fmt(Number(item.price) * item.quantity)}
                     </span>
                   </div>
                 </div>
