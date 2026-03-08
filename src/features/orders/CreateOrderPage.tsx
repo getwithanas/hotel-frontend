@@ -251,7 +251,7 @@ export default function CreateOrderPage() {
                           <Leaf className="h-3 w-3 text-success shrink-0" />
                         )}
                       </div>
-                      <span className="font-bold text-primary text-sm whitespace-nowrap">${item.price.toFixed(2)}</span>
+                      <span className="font-bold text-primary text-sm whitespace-nowrap">${fmt(item.price)}</span>
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-1">{item.description}</p>}
 
