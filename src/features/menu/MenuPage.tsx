@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn, fmt } from '@/lib/utils';
+import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
 
 const cardVariants = {
