@@ -62,7 +62,16 @@ export default function KitchenDisplayPage() {
             <p className="page-subtitle">{orders?.length || 0} active orders</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn('h-9 w-9', soundMuted ? 'text-muted-foreground' : 'text-foreground')}
+            onClick={toggleMute}
+            title={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
+          >
+            {soundMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </Button>
           <span className="animate-pulse-dot h-2 w-2 rounded-full bg-success" />
           <span className="text-xs text-muted-foreground">Live</span>
         </div>
