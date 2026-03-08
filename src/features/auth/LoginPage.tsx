@@ -240,6 +240,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   className="h-12 rounded-xl bg-muted/40 border-border/50 px-4 pr-11 text-sm focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-background transition-all"
+                  autoComplete="current-password"
                   {...register('password')}
                   onFocus={() => setFocused('password')}
                   onBlur={() => setFocused(null)}

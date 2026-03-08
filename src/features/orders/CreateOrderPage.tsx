@@ -351,7 +351,7 @@ export default function CreateOrderPage() {
                     <div className="flex justify-between text-lg font-bold text-foreground">
                       <span>Total</span>
                       <motion.span key={cartTotal} initial={{ scale: 1.1 }} animate={{ scale: 1 }}>
-                        ${cartTotal.toFixed(2)}
+                        ${fmt(cartTotal)}
                       </motion.span>
                     </div>
                   </div>
