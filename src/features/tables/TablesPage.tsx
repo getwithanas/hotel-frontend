@@ -25,7 +25,7 @@ export default function TablesPage() {
   const [filter, setFilter] = useState<string>('ALL');
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateTableRequest>({ number: 1, capacity: 4 });
+  const [createForm, setCreateForm] = useState<CreateTableRequest>({ number: '1', capacity: 4 });
 
   const { data: tables, isLoading } = useQuery({
     queryKey: ['tables'],
