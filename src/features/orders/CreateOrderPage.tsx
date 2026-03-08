@@ -341,7 +341,7 @@ export default function CreateOrderPage() {
                           className="mt-2 h-7 text-xs bg-background"
                         />
                         <div className="text-right mt-1">
-                          <span className="text-sm font-semibold text-foreground">${(item.menuItem.price * item.quantity).toFixed(2)}</span>
+                          <span className="text-sm font-semibold text-foreground">${fmt(Number(item.menuItem.price) * item.quantity)}</span>
                         </div>
                       </motion.div>
                     ))}
