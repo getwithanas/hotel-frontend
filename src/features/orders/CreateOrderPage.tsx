@@ -7,6 +7,7 @@ import { categoriesService } from '@/services/categories.service';
 import { ordersService } from '@/services/orders.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
+import { MenuItemImage } from '@/components/common/MenuItemImage';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -237,11 +238,9 @@ export default function CreateOrderPage() {
                   whileHover={{ y: -2 }}
                 >
                   {/* Image area */}
-                  {item.image ? (
-                    <div className="h-28 bg-muted overflow-hidden">
-                      <img src={imgUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                  ) : null}
+                  {item.image && (
+                    <MenuItemImage src={item.image} alt={item.name} className="h-28" />
+                  )}
 
                   <div className="p-3">
                     <div className="flex items-start justify-between gap-2 mb-1">

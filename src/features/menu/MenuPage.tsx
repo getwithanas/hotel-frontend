@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { menuService } from '@/services/menu.service';
 import { categoriesService } from '@/services/categories.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { MenuItemImage } from '@/components/common/MenuItemImage';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -180,7 +181,7 @@ export default function MenuPage() {
                   {/* Image */}
                   <div className="h-36 bg-muted/50 flex items-center justify-center overflow-hidden relative">
                     {item.image ? (
-                      <img src={imgUrl(item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <MenuItemImage src={item.image} alt={item.name} className="w-full h-full" />
                     ) : (
                       <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
                     )}
