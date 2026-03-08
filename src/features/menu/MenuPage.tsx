@@ -57,7 +57,6 @@ export default function MenuPage() {
   });
 
   const LOW_STOCK_THRESHOLD = Number(settings?.lowStockThreshold) || DEFAULT_LOW_STOCK_THRESHOLD;
-  });
 
   const createItemMutation = useMutation({
     mutationFn: (data: FormData) => editingItem ? menuService.update(editingItem.id, data) : menuService.create(data),
