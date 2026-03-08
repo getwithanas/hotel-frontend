@@ -57,6 +57,7 @@ export function playNewOrderSound() {
 
 /** Play a short success beep (item ready, bill generated) */
 export function playSuccessSound() {
+  if (muted) return;
   try {
     const ctx = getAudioContext();
     const now = ctx.currentTime;
