@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn, fmt } from '@/lib/utils';
 import type { Order } from '@/types';
 import { StatusBadge } from './StatusBadge';
 import { ORDER_STATUS_LABELS } from '@/lib/constants';
