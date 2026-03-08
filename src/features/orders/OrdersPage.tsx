@@ -13,6 +13,7 @@ import { Plus, ShoppingCart } from 'lucide-react';
 import type { Order, OrderStatus } from '@/types';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_FLOW } from '@/lib/constants';
 import { toast } from 'sonner';
+import { fmt } from '@/lib/utils';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
