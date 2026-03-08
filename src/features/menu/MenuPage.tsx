@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon, AlertTriangle } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon, AlertTriangle, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
@@ -37,7 +37,7 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '' });
+  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '', spiceLevel: '0' });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
 
@@ -106,10 +106,10 @@ export default function MenuPage() {
   const openItemDialog = (item?: MenuItem) => {
     if (item) {
       setEditingItem(item);
-      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg, stock: (item.stock ?? 0).toString() });
+      setItemForm({ name: item.name, description: item.description || '', price: item.price.toString(), categoryId: item.categoryId.toString(), isVeg: item.isVeg, stock: (item.stock ?? 0).toString(), spiceLevel: (item.spiceLevel ?? 0).toString() });
     } else {
       setEditingItem(null);
-      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '' });
+      setItemForm({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '', spiceLevel: '0' });
     }
     setImageFile(null);
     setShowItemDialog(true);
@@ -123,6 +123,7 @@ export default function MenuPage() {
     fd.append('categoryId', itemForm.categoryId);
     fd.append('isVeg', itemForm.isVeg.toString());
     fd.append('stock', itemForm.stock || '0');
+    fd.append('spiceLevel', itemForm.spiceLevel || '0');
     if (imageFile) fd.append('image', imageFile);
     createItemMutation.mutate(fd);
   };
@@ -251,6 +252,13 @@ export default function MenuPage() {
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                      {(item.spiceLevel ?? 0) > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive flex items-center gap-0.5">
+                          {Array.from({ length: item.spiceLevel! }).map((_, i) => (
+                            <Flame key={i} className="h-2.5 w-2.5" />
+                          ))}
+                        </span>
+                      )}
                       {(item.stock ?? 0) === 0 ? (
                         <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive animate-pulse">
                           Out of Stock
@@ -374,6 +382,29 @@ export default function MenuPage() {
                 <Switch checked={itemForm.isVeg} onCheckedChange={v => setItemForm(f => ({ ...f, isVeg: v }))} />
                 <Label>Vegetarian</Label>
               </div>
+              <div className="space-y-2">
+                <Label>Spice Level</Label>
+                <div className="flex items-center gap-1">
+                  {[0, 1, 2, 3, 4, 5].map(level => (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => setItemForm(f => ({ ...f, spiceLevel: level.toString() }))}
+                      className={cn(
+                        'h-8 w-8 rounded-md flex items-center justify-center text-xs font-medium transition-colors border',
+                        Number(itemForm.spiceLevel) >= level && level > 0
+                          ? 'bg-destructive/15 border-destructive/30 text-destructive'
+                          : 'bg-muted border-border text-muted-foreground hover:bg-muted/80'
+                      )}
+                      title={level === 0 ? 'No spice' : `Level ${level}`}
+                    >
+                      {level === 0 ? '0' : <Flame className="h-3.5 w-3.5" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Stock</Label>
                 <Input type="number" min="0" value={itemForm.stock} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" />
