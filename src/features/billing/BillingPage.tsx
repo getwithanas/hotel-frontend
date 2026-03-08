@@ -148,12 +148,12 @@ export default function BillingPage() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="text-xs text-muted-foreground">Subtotal: ${bill.subtotal.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">Tax: ${bill.taxAmount.toFixed(2)} ({bill.taxRate}%)</p>
-                  {bill.discount > 0 && <p className="text-xs text-success">Discount: -${bill.discount.toFixed(2)}</p>}
+                  <p className="text-xs text-muted-foreground">Subtotal: ${fmt(bill.subtotal)}</p>
+                  <p className="text-xs text-muted-foreground">Tax: ${fmt(bill.taxAmount)} ({bill.taxRate}%)</p>
+                  {bill.discount > 0 && <p className="text-xs text-success">Discount: -${fmt(bill.discount)}</p>}
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-foreground">${bill.total.toFixed(2)}</p>
+                  <p className="text-lg font-bold text-foreground">${fmt(bill.total)}</p>
                   <StatusBadge status={bill.paymentMethod} label={bill.paymentMethod} />
                 </div>
                 <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => handlePrintBill(bill)} title="Print Bill">
