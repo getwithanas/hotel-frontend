@@ -45,6 +45,7 @@ export default function SettingsPage() {
     { key: 'currency', label: 'Currency', type: 'text' },
     { key: 'address', label: 'Address', type: 'text' },
     { key: 'phone', label: 'Phone', type: 'text' },
+    { key: 'lowStockThreshold', label: 'Low Stock Alert Threshold', type: 'number' },
   ];
 
   return (
