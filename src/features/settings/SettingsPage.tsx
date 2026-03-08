@@ -13,6 +13,7 @@ import type { Settings } from '@/types';
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
+  const { theme, setTheme } = useTheme();
   const [form, setForm] = useState<Record<string, string>>({});
 
   const { data: settings, isLoading } = useQuery({
