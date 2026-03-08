@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2, Hotel, Eye, EyeOff, ArrowRight, Utensils, BarChart3, ClipboardList } from 'lucide-react';
 import { motion } from 'framer-motion';
+import hotelIllustration from '@/assets/hotel-illustration.png';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -22,16 +23,9 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 const features = [
-  { icon: ClipboardList, title: 'Order Management', desc: 'Track orders in real-time from table to kitchen' },
-  { icon: Utensils, title: 'Kitchen Display', desc: 'Live kitchen queue with priority & timing' },
-  { icon: BarChart3, title: 'Analytics', desc: 'Revenue reports, trends & staff performance' },
-];
-
-const floatingShapes = [
-  { size: 320, x: '10%', y: '15%', delay: 0, duration: 18 },
-  { size: 200, x: '65%', y: '60%', delay: 2, duration: 22 },
-  { size: 140, x: '80%', y: '10%', delay: 4, duration: 15 },
-  { size: 260, x: '30%', y: '75%', delay: 1, duration: 20 },
+  { icon: ClipboardList, label: 'Live Orders' },
+  { icon: Utensils, label: 'Kitchen Display' },
+  { icon: BarChart3, label: 'Analytics' },
 ];
 
 export default function LoginPage() {
@@ -61,104 +55,83 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-background">
-      {/* Left panel — immersive branding */}
+      {/* Left panel — illustration showcase */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-[hsl(220_25%_8%)]" />
+        {/* Deep gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(220_30%_15%)] via-[hsl(220_35%_12%)] to-[hsl(220_40%_6%)]" />
 
-        {/* Floating orbs */}
-        {floatingShapes.map((shape, i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: shape.size,
-              height: shape.size,
-              left: shape.x,
-              top: shape.y,
-              background: `radial-gradient(circle, hsl(var(--primary-foreground) / 0.06), transparent 70%)`,
-            }}
-            animate={{
-              y: [0, -30, 0, 20, 0],
-              x: [0, 15, -10, 5, 0],
-              scale: [1, 1.05, 0.95, 1.02, 1],
-            }}
-            transition={{
-              duration: shape.duration,
-              delay: shape.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
+        {/* Subtle radial glow behind illustration */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/15 blur-[120px] pointer-events-none" />
 
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `linear-gradient(hsl(var(--primary-foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary-foreground)) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
+        {/* Grid dots */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: `radial-gradient(circle, hsl(var(--primary-foreground)) 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
         }} />
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 flex flex-col justify-between p-14 text-primary-foreground w-full"
-        >
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Top logo */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="flex items-center gap-3"
           >
-            <div className="flex items-center justify-center h-11 w-11 rounded-2xl bg-primary-foreground/10 backdrop-blur-md border border-primary-foreground/10">
-              <Hotel className="h-5 w-5" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary-foreground/10 backdrop-blur-md border border-primary-foreground/10">
+              <Hotel className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold tracking-tight">HotelPOS</span>
+            <span className="text-lg font-bold tracking-tight text-primary-foreground">HotelPOS</span>
           </motion.div>
 
-          {/* Center content */}
-          <div className="space-y-10">
+          {/* Center — illustration + tagline */}
+          <div className="flex flex-col items-center text-center -mt-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="space-y-4"
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
+              className="relative"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/10 text-xs font-medium tracking-wide uppercase">
-                <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-                System Online
-              </div>
-              <h2 className="text-5xl font-bold leading-[1.1] tracking-tight">
-                Your hotel,
-                <br />
-                <span className="text-primary-foreground/70">fully in control.</span>
+              {/* Glow ring */}
+              <div className="absolute inset-0 -m-6 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+              <img
+                src={hotelIllustration}
+                alt="Hotel restaurant operations illustration"
+                className="w-[420px] h-auto relative z-10 drop-shadow-2xl"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mt-8 space-y-3"
+            >
+              <h2 className="text-3xl font-bold text-primary-foreground tracking-tight leading-tight">
+                Your hotel,<br />
+                <span className="text-primary-foreground/60">fully in control.</span>
               </h2>
-              <p className="text-primary-foreground/50 text-lg leading-relaxed max-w-md">
-                One platform to manage every order, every table, and every guest experience — effortlessly.
+              <p className="text-primary-foreground/40 text-sm max-w-xs mx-auto leading-relaxed">
+                Manage orders, tables, kitchen workflows and billing from one unified platform.
               </p>
             </motion.div>
 
-            {/* Feature cards */}
-            <div className="space-y-3">
-              {features.map((feature, i) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-primary-foreground/[0.06] backdrop-blur-sm border border-primary-foreground/[0.06] hover:bg-primary-foreground/[0.1] transition-colors group"
+            {/* Feature pills */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.7 }}
+              className="flex items-center gap-2 mt-6"
+            >
+              {features.map((f) => (
+                <div
+                  key={f.label}
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-primary-foreground/[0.07] border border-primary-foreground/[0.08] backdrop-blur-sm"
                 >
-                  <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary-foreground/10 group-hover:bg-primary-foreground/15 transition-colors shrink-0">
-                    <feature.icon className="h-5 w-5 text-primary-foreground/80" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">{feature.title}</div>
-                    <div className="text-xs text-primary-foreground/40">{feature.desc}</div>
-                  </div>
-                </motion.div>
+                  <f.icon className="h-3.5 w-3.5 text-primary-foreground/60" />
+                  <span className="text-xs font-medium text-primary-foreground/70">{f.label}</span>
+                </div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           {/* Bottom stats */}
@@ -174,18 +147,18 @@ export default function LoginPage() {
               { value: '24/7', label: 'Support' },
             ].map((stat) => (
               <div key={stat.label}>
-                <div className="text-lg font-bold">{stat.value}</div>
-                <div className="text-[10px] text-primary-foreground/35 uppercase tracking-widest mt-0.5">{stat.label}</div>
+                <div className="text-base font-bold text-primary-foreground">{stat.value}</div>
+                <div className="text-[10px] text-primary-foreground/30 uppercase tracking-widest mt-0.5">{stat.label}</div>
               </div>
             ))}
           </motion.div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Right panel — login form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative">
-        {/* Subtle background accent */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -193,12 +166,19 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
           className="w-full max-w-[380px] relative z-10"
         >
-          {/* Mobile logo */}
-          <div className="flex items-center gap-3 mb-10 lg:hidden">
-            <div className="flex items-center justify-center h-11 w-11 rounded-2xl bg-primary text-primary-foreground">
-              <Hotel className="h-5 w-5" />
+          {/* Mobile header with illustration */}
+          <div className="lg:hidden mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center justify-center h-11 w-11 rounded-2xl bg-primary text-primary-foreground">
+                <Hotel className="h-5 w-5" />
+              </div>
+              <span className="text-xl font-bold tracking-tight text-foreground">HotelPOS</span>
             </div>
-            <span className="text-xl font-bold tracking-tight text-foreground">HotelPOS</span>
+            <img
+              src={hotelIllustration}
+              alt="Hotel restaurant operations"
+              className="w-48 h-auto mx-auto mb-4 drop-shadow-lg"
+            />
           </div>
 
           <div className="space-y-2 mb-8">
@@ -211,24 +191,24 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email field */}
+            {/* Email */}
             <div className="space-y-2">
               <Label
                 htmlFor="email"
-                className={`text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`text-xs font-semibold uppercase tracking-wider transition-colors duration-200 ${
                   focused === 'email' ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
                 Email address
               </Label>
-              <div className={`relative rounded-xl transition-all duration-200 ${
-                focused === 'email' ? 'ring-2 ring-primary/20' : ''
+              <div className={`rounded-xl transition-shadow duration-200 ${
+                focused === 'email' ? 'ring-2 ring-primary/20 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.15)]' : ''
               }`}>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@hotel.com"
-                  className="h-12 rounded-xl bg-muted/40 border-border/50 px-4 text-sm focus-visible:ring-primary focus-visible:bg-background transition-all"
+                  className="h-12 rounded-xl bg-muted/40 border-border/50 px-4 text-sm focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-background transition-all"
                   {...register('email')}
                   onFocus={() => setFocused('email')}
                   onBlur={() => setFocused(null)}
@@ -236,34 +216,30 @@ export default function LoginPage() {
                 />
               </div>
               {errors.email && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-xs text-destructive flex items-center gap-1"
-                >
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-destructive">
                   {errors.email.message}
                 </motion.p>
               )}
             </div>
 
-            {/* Password field */}
+            {/* Password */}
             <div className="space-y-2">
               <Label
                 htmlFor="password"
-                className={`text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`text-xs font-semibold uppercase tracking-wider transition-colors duration-200 ${
                   focused === 'password' ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
                 Password
               </Label>
-              <div className={`relative rounded-xl transition-all duration-200 ${
-                focused === 'password' ? 'ring-2 ring-primary/20' : ''
+              <div className={`relative rounded-xl transition-shadow duration-200 ${
+                focused === 'password' ? 'ring-2 ring-primary/20 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.15)]' : ''
               }`}>
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
-                  className="h-12 rounded-xl bg-muted/40 border-border/50 px-4 pr-11 text-sm focus-visible:ring-primary focus-visible:bg-background transition-all"
+                  className="h-12 rounded-xl bg-muted/40 border-border/50 px-4 pr-11 text-sm focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-background transition-all"
                   {...register('password')}
                   onFocus={() => setFocused('password')}
                   onBlur={() => setFocused(null)}
@@ -278,11 +254,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-xs text-destructive flex items-center gap-1"
-                >
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-destructive">
                   {errors.password.message}
                 </motion.p>
               )}
@@ -291,23 +263,20 @@ export default function LoginPage() {
             {/* Submit */}
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl font-semibold text-sm gap-2 group relative overflow-hidden"
+              className="w-full h-12 rounded-xl font-semibold text-sm gap-2 group"
               disabled={loading}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    Sign In
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </>
-                )}
-              </span>
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-8">
             <div className="flex-1 h-px bg-border" />
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Need help?</span>
@@ -315,9 +284,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            Can't access your account? Reach out to your
-            <br />
-            system administrator for assistance.
+            Can't access your account? Reach out to your<br />system administrator for assistance.
           </p>
         </motion.div>
       </div>
