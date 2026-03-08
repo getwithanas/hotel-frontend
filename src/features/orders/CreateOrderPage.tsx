@@ -319,7 +319,7 @@ export default function CreateOrderPage() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-foreground truncate">{item.menuItem.name}</p>
-                            <p className="text-xs text-muted-foreground">${item.menuItem.price.toFixed(2)} × {item.quantity}</p>
+                            <p className="text-xs text-muted-foreground">${fmt(item.menuItem.price)} × {item.quantity}</p>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.menuItem.id, -1)}>
