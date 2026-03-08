@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn, fmt } from '@/lib/utils';
+import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
 
 const cardVariants = {
@@ -180,7 +180,7 @@ export default function MenuPage() {
                   {/* Image */}
                   <div className="h-36 bg-muted/50 flex items-center justify-center overflow-hidden relative">
                     {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <img src={imgUrl(item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
                       <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
                     )}
