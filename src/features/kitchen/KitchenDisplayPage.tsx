@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersService } from '@/services/orders.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -5,10 +6,11 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { ITEM_STATUS_LABELS, ORDER_STATUS_LABELS } from '@/lib/constants';
-import { ChefHat, Clock, CheckCircle2 } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { isMuted, setMuted } from '@/lib/notification-sound';
 import type { OrderItemStatus } from '@/types';
 
 export default function KitchenDisplayPage() {
