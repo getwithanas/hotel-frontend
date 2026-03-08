@@ -180,7 +180,7 @@ export default function MenuPage() {
                   {/* Image */}
                   <div className="h-36 bg-muted/50 flex items-center justify-center overflow-hidden relative">
                     {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <img src={imgUrl(item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
                       <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
                     )}

@@ -239,7 +239,7 @@ export default function CreateOrderPage() {
                   {/* Image area */}
                   {item.image ? (
                     <div className="h-28 bg-muted overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={imgUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                   ) : null}
 
