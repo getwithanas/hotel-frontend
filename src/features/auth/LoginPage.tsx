@@ -126,7 +126,7 @@ export default function LoginPage() {
               className="space-y-4"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/10 text-xs font-medium tracking-wide uppercase">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
                 System Online
               </div>
               <h2 className="text-5xl font-bold leading-[1.1] tracking-tight">
