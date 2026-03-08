@@ -35,9 +35,10 @@ export default function CreateOrderPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [deliveryInfo, setDeliveryInfo] = useState({ customerName: '', phone: '', address: '' });
 
-  const { data: menuItems, isLoading: menuLoading } = useQuery({
+  const { data: menuItems, isLoading: menuLoading, isError: menuError } = useQuery({
     queryKey: ['menu'],
     queryFn: () => menuService.list({ available: true }),
+    retry: 2,
   });
 
   const { data: tables } = useQuery({
@@ -110,7 +111,18 @@ export default function CreateOrderPage() {
     createMutation.mutate(data);
   };
 
-  if (menuLoading) return <LoadingSpinner size="lg" />;
+  if (menuLoading) return <LoadingSpinner size="lg" text="Loading menu..." />;
+
+  if (menuError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <p className="text-muted-foreground">Failed to load menu. Check your connection.</p>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div>
