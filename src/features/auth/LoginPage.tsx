@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { LoginRequest } from '@/types';
 import { z } from 'zod';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth-store';
