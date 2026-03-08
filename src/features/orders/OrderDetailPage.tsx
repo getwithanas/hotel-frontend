@@ -253,7 +253,7 @@ export default function OrderDetailPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-muted-foreground">×{item.quantity}</span>
                       <span className="text-xs text-muted-foreground">
-                        @ ${item.price.toFixed(2)}
+                        @ ${fmt(item.price)}
                       </span>
                     </div>
                     {item.note && (
