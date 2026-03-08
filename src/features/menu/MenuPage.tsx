@@ -14,10 +14,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
+
+const LOW_STOCK_THRESHOLD = 5;
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -28,6 +30,7 @@ export default function MenuPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
+  const [stockFilter, setStockFilter] = useState<string>('ALL');
   const [showItemDialog, setShowItemDialog] = useState(false);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -119,8 +122,12 @@ export default function MenuPage() {
   const filteredItems = menuItems?.filter(item => {
     const matchesSearch = !search || item.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'ALL' || item.categoryId.toString() === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesStock = stockFilter === 'ALL' || (stockFilter === 'LOW' && (item.stock ?? 0) > 0 && (item.stock ?? 0) <= LOW_STOCK_THRESHOLD) || (stockFilter === 'OUT' && (item.stock ?? 0) === 0);
+    return matchesSearch && matchesCategory && matchesStock;
   }) || [];
+
+  const lowStockItems = menuItems?.filter(i => (i.stock ?? 0) > 0 && (i.stock ?? 0) <= LOW_STOCK_THRESHOLD) || [];
+  const outOfStockItems = menuItems?.filter(i => (i.stock ?? 0) === 0) || [];
 
   if (menuLoading) return <LoadingSpinner size="lg" />;
 
@@ -145,6 +152,26 @@ export default function MenuPage() {
         </TabsList>
 
         <TabsContent value="items" className="space-y-4 mt-4">
+          {/* Low stock warning banner */}
+          {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
+            <div className="flex items-start gap-3 p-3 rounded-lg border border-warning/30 bg-warning/5">
+              <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+              <div className="text-sm">
+                {outOfStockItems.length > 0 && (
+                  <p className="text-destructive font-medium">
+                    {outOfStockItems.length} item{outOfStockItems.length > 1 ? 's' : ''} out of stock
+                  </p>
+                )}
+                {lowStockItems.length > 0 && (
+                  <p className="text-warning-foreground">
+                    {lowStockItems.length} item{lowStockItems.length > 1 ? 's' : ''} running low (≤{LOW_STOCK_THRESHOLD}):{' '}
+                    <span className="font-medium">{lowStockItems.map(i => `${i.name} (${i.stock})`).join(', ')}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 flex-1 flex-wrap">
               <div className="relative flex-1 min-w-[200px]">
@@ -156,6 +183,14 @@ export default function MenuPage() {
                 <SelectContent>
                   <SelectItem value="ALL">All Categories</SelectItem>
                   {categories?.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={stockFilter} onValueChange={setStockFilter}>
+                <SelectTrigger className="w-[140px]"><SelectValue placeholder="Stock" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Stock</SelectItem>
+                  <SelectItem value="LOW">Low Stock</SelectItem>
+                  <SelectItem value="OUT">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -208,9 +243,19 @@ export default function MenuPage() {
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
-                      <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', item.stock > 0 ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive')}>
-                        Stock: {item.stock ?? 0}
-                      </span>
+                      {(item.stock ?? 0) === 0 ? (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive animate-pulse">
+                          Out of Stock
+                        </span>
+                      ) : (item.stock ?? 0) <= LOW_STOCK_THRESHOLD ? (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-warning/15 text-warning-foreground">
+                          ⚠ Low: {item.stock}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-success/10 text-success">
+                          Stock: {item.stock}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
