@@ -35,9 +35,10 @@ export default function CreateOrderPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [deliveryInfo, setDeliveryInfo] = useState({ customerName: '', phone: '', address: '' });
 
-  const { data: menuItems, isLoading: menuLoading } = useQuery({
+  const { data: menuItems, isLoading: menuLoading, isError: menuError } = useQuery({
     queryKey: ['menu'],
     queryFn: () => menuService.list({ available: true }),
+    retry: 2,
   });
 
   const { data: tables } = useQuery({
