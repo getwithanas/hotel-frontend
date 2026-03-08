@@ -38,12 +38,25 @@ interface TopBarProps {
 }
 
 export function TopBar({ children }: TopBarProps) {
-  const { user } = useAuthStore();
+  const { user, logout, hasRole } = useAuthStore();
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { notifications, markAllRead, markRead, clearAll, unreadCount } = useNotificationStore();
   const count = unreadCount();
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const initials = user?.name
+    ?.split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || '?';
 
   return (
     <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4 shrink-0">
@@ -136,11 +149,52 @@ export function TopBar({ children }: TopBarProps) {
           </PopoverContent>
         </Popover>
 
+        {/* User profile dropdown */}
         {user && (
-          <div className="flex items-center gap-2">
-            <StatusBadge status={user.role} />
-            <span className="text-sm font-medium text-foreground hidden sm:inline">{user.name}</span>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2 px-2 h-9">
+                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0">
+                  {initials}
+                </div>
+                <div className="hidden sm:flex flex-col items-start">
+                  <span className="text-xs font-medium text-foreground leading-tight">{user.name}</span>
+                  <span className="text-[10px] text-muted-foreground leading-tight">{user.role}</span>
+                </div>
+                <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:block" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-medium text-foreground">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/orders/new')} className="cursor-pointer">
+                <ShoppingCart className="h-4 w-4 mr-2" /> New Order
+              </DropdownMenuItem>
+              {hasRole('ADMIN') && (
+                <DropdownMenuItem onClick={() => navigate('/reports')} className="cursor-pointer">
+                  <BarChart3 className="h-4 w-4 mr-2" /> Reports
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              {hasRole('ADMIN') && (
+                <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+                  <Settings className="h-4 w-4 mr-2" /> Settings
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+                <User className="h-4 w-4 mr-2" /> My Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+                <LogOut className="h-4 w-4 mr-2" /> Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </header>
