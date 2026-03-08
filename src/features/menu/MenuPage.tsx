@@ -51,6 +51,14 @@ export default function MenuPage() {
     queryFn: () => categoriesService.list(),
   });
 
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: settingsService.get,
+  });
+
+  const LOW_STOCK_THRESHOLD = Number(settings?.lowStockThreshold) || DEFAULT_LOW_STOCK_THRESHOLD;
+  });
+
   const createItemMutation = useMutation({
     mutationFn: (data: FormData) => editingItem ? menuService.update(editingItem.id, data) : menuService.create(data),
     onSuccess: () => {
