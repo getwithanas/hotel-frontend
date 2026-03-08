@@ -34,12 +34,15 @@ export function AppLayout() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
+        {/* Sidebar hidden on mobile */}
+        <div className="hidden md:block">
+          <AppSidebar />
+        </div>
         <div className="flex-1 flex flex-col min-w-0">
           <TopBar>
-            <SidebarTrigger className="mr-2" />
+            <SidebarTrigger className="mr-2 hidden md:inline-flex" />
           </TopBar>
-          <main className="flex-1 p-4 md:p-6 overflow-auto">
+          <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
@@ -54,6 +57,7 @@ export function AppLayout() {
             </AnimatePresence>
           </main>
         </div>
+        <MobileBottomNav />
       </div>
     </SidebarProvider>
   );
