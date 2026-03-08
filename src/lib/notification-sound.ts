@@ -23,6 +23,7 @@ function getAudioContext(): AudioContext {
 
 /** Play a two-tone chime for new orders (kitchen alert) */
 export function playNewOrderSound() {
+  if (muted) return;
   try {
     const ctx = getAudioContext();
     const now = ctx.currentTime;
