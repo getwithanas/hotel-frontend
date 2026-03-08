@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { billsService } from '@/services/bills.service';
 import { ordersService } from '@/services/orders.service';
+import { settingsService } from '@/services/settings.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { StatusBadge } from '@/components/common/StatusBadge';
@@ -11,9 +12,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Receipt, Plus } from 'lucide-react';
-import { PAYMENT_METHODS, ORDER_STATUS_LABELS } from '@/lib/constants';
-import type { Bill, PaymentMethod, Order } from '@/types';
+import { Receipt, Plus, Printer } from 'lucide-react';
+import { PAYMENT_METHODS } from '@/lib/constants';
+import { printBill } from '@/lib/print-utils';
+import type { Bill, PaymentMethod } from '@/types';
 
 export default function BillingPage() {
   const queryClient = useQueryClient();
@@ -33,6 +35,11 @@ export default function BillingPage() {
     queryFn: () => ordersService.list({ status: 'SERVED' }),
   });
 
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: settingsService.get,
+  });
+
   const generateMutation = useMutation({
     mutationFn: () => billsService.generate({
       orderId: parseInt(selectedOrderId),
@@ -47,6 +54,46 @@ export default function BillingPage() {
       toast.success('Bill generated');
     },
   });
+
+  const handlePrintBill = async (bill: Bill) => {
+    try {
+      const fullBill = await billsService.getById(bill.id);
+      const order = fullBill.order;
+      printBill({
+        billId: fullBill.id,
+        orderId: fullBill.orderId,
+        hotelName: settings?.hotelName,
+        items: order?.items?.map(i => ({
+          name: i.menuItem?.name || `Item #${i.menuItemId}`,
+          qty: i.quantity,
+          price: i.price,
+          total: i.price * i.quantity,
+        })) || [],
+        subtotal: fullBill.subtotal,
+        taxRate: fullBill.taxRate,
+        taxAmount: fullBill.taxAmount,
+        discount: fullBill.discount,
+        total: fullBill.total,
+        paymentMethod: fullBill.paymentMethod,
+        date: fullBill.createdAt,
+      });
+    } catch {
+      // Fallback: print with available data
+      printBill({
+        billId: bill.id,
+        orderId: bill.orderId,
+        hotelName: settings?.hotelName,
+        items: [],
+        subtotal: bill.subtotal,
+        taxRate: bill.taxRate,
+        taxAmount: bill.taxAmount,
+        discount: bill.discount,
+        total: bill.total,
+        paymentMethod: bill.paymentMethod,
+        date: bill.createdAt,
+      });
+    }
+  };
 
   if (isLoading) return <LoadingSpinner size="lg" />;
 
@@ -94,6 +141,9 @@ export default function BillingPage() {
                   <p className="text-lg font-bold text-foreground">${bill.total.toFixed(2)}</p>
                   <StatusBadge status={bill.paymentMethod} label={bill.paymentMethod} />
                 </div>
+                <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => handlePrintBill(bill)} title="Print Bill">
+                  <Printer className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           ))}

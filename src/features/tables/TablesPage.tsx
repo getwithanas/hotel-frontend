@@ -25,7 +25,7 @@ export default function TablesPage() {
   const [filter, setFilter] = useState<string>('ALL');
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateTableRequest>({ number: 1, capacity: 4 });
+  const [createForm, setCreateForm] = useState<CreateTableRequest>({ number: '1', capacity: 4 });
 
   const { data: tables, isLoading } = useQuery({
     queryKey: ['tables'],
@@ -102,7 +102,7 @@ export default function TablesPage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Table Number</Label>
-              <Input type="number" value={createForm.number} onChange={e => setCreateForm(f => ({ ...f, number: parseInt(e.target.value) || 1 }))} />
+              <Input type="number" value={createForm.number} onChange={e => setCreateForm(f => ({ ...f, number: e.target.value }))} />
             </div>
             <div className="space-y-2">
               <Label>Capacity</Label>
