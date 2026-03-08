@@ -285,18 +285,18 @@ export default function OrderDetailPage() {
                 <p className="text-sm font-semibold text-foreground">Bill Summary</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-right text-foreground">${order.bill.subtotal.toFixed(2)}</span>
+                  <span className="text-right text-foreground">${fmt(order.bill.subtotal)}</span>
                   <span className="text-muted-foreground">Tax ({order.bill.taxRate}%)</span>
-                  <span className="text-right text-foreground">${order.bill.taxAmount.toFixed(2)}</span>
+                  <span className="text-right text-foreground">${fmt(order.bill.taxAmount)}</span>
                   {order.bill.discount > 0 && (
                     <>
                       <span className="text-muted-foreground">Discount</span>
-                      <span className="text-right text-foreground">-${order.bill.discount.toFixed(2)}</span>
+                      <span className="text-right text-foreground">-${fmt(order.bill.discount)}</span>
                     </>
                   )}
                   <Separator className="col-span-2" />
                   <span className="font-semibold text-foreground">Total</span>
-                  <span className="text-right font-bold text-foreground">${order.bill.total.toFixed(2)}</span>
+                  <span className="text-right font-bold text-foreground">${fmt(order.bill.total)}</span>
                   <span className="text-muted-foreground">Payment</span>
                   <span className="text-right text-foreground capitalize">{order.bill.paymentMethod.toLowerCase()}</span>
                 </div>

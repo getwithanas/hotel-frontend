@@ -180,7 +180,7 @@ export default function BillingPage() {
                 <SelectContent>
                   {servedOrders?.map(o => (
                     <SelectItem key={o.id} value={o.id.toString()}>
-                      Order #{o.id} {o.table ? `- Table ${o.table.number}` : ''} (${o.totalAmount?.toFixed(2)})
+                      Order #{o.id} {o.table ? `- Table ${o.table.number}` : ''} (${fmt(o.totalAmount)})
                     </SelectItem>
                   ))}
                 </SelectContent>

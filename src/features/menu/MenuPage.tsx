@@ -201,7 +201,7 @@ export default function MenuPage() {
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <h4 className="font-semibold text-foreground text-sm leading-tight">{item.name}</h4>
-                      <span className="font-bold text-primary text-sm whitespace-nowrap">${item.price.toFixed(2)}</span>
+                      <span className="font-bold text-primary text-sm whitespace-nowrap">${fmt(item.price)}</span>
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
                     <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
