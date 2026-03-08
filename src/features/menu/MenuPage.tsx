@@ -152,6 +152,26 @@ export default function MenuPage() {
         </TabsList>
 
         <TabsContent value="items" className="space-y-4 mt-4">
+          {/* Low stock warning banner */}
+          {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
+            <div className="flex items-start gap-3 p-3 rounded-lg border border-warning/30 bg-warning/5">
+              <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+              <div className="text-sm">
+                {outOfStockItems.length > 0 && (
+                  <p className="text-destructive font-medium">
+                    {outOfStockItems.length} item{outOfStockItems.length > 1 ? 's' : ''} out of stock
+                  </p>
+                )}
+                {lowStockItems.length > 0 && (
+                  <p className="text-warning-foreground">
+                    {lowStockItems.length} item{lowStockItems.length > 1 ? 's' : ''} running low (≤{LOW_STOCK_THRESHOLD}):{' '}
+                    <span className="font-medium">{lowStockItems.map(i => `${i.name} (${i.stock})`).join(', ')}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 flex-1 flex-wrap">
               <div className="relative flex-1 min-w-[200px]">
@@ -163,6 +183,14 @@ export default function MenuPage() {
                 <SelectContent>
                   <SelectItem value="ALL">All Categories</SelectItem>
                   {categories?.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={stockFilter} onValueChange={setStockFilter}>
+                <SelectTrigger className="w-[140px]"><SelectValue placeholder="Stock" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Stock</SelectItem>
+                  <SelectItem value="LOW">Low Stock</SelectItem>
+                  <SelectItem value="OUT">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
             </div>
