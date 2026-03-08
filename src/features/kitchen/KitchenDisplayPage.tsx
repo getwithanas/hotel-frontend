@@ -15,6 +15,14 @@ import type { OrderItemStatus } from '@/types';
 
 export default function KitchenDisplayPage() {
   const queryClient = useQueryClient();
+  const [soundMuted, setSoundMuted] = useState(isMuted());
+
+  const toggleMute = () => {
+    const newVal = !soundMuted;
+    setSoundMuted(newVal);
+    setMuted(newVal);
+    toast.info(newVal ? 'Sounds muted' : 'Sounds enabled');
+  };
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ['kitchen-orders'],
