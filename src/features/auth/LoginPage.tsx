@@ -54,7 +54,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="h-screen flex bg-background overflow-hidden">
       {/* Left panel — illustration showcase */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
         {/* Deep gradient background */}
