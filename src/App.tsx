@@ -10,6 +10,7 @@ import DashboardPage from "@/features/dashboard/DashboardPage";
 import TablesPage from "@/features/tables/TablesPage";
 import OrdersPage from "@/features/orders/OrdersPage";
 import CreateOrderPage from "@/features/orders/CreateOrderPage";
+import OrderDetailPage from "@/features/orders/OrderDetailPage";
 import KitchenDisplayPage from "@/features/kitchen/KitchenDisplayPage";
 import MenuPage from "@/features/menu/MenuPage";
 import BillingPage from "@/features/billing/BillingPage";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/tables" element={<ProtectedRoute allowedRoles={['ADMIN', 'WAITER']}><TablesPage /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute allowedRoles={['ADMIN', 'WAITER', 'CASHIER']}><OrdersPage /></ProtectedRoute>} />
             <Route path="/orders/new" element={<ProtectedRoute allowedRoles={['ADMIN', 'WAITER', 'CASHIER']}><CreateOrderPage /></ProtectedRoute>} />
+            <Route path="/orders/:id" element={<ProtectedRoute allowedRoles={['ADMIN', 'WAITER', 'CASHIER']}><OrderDetailPage /></ProtectedRoute>} />
             <Route path="/kitchen" element={<ProtectedRoute allowedRoles={['ADMIN', 'KITCHEN']}><KitchenDisplayPage /></ProtectedRoute>} />
             <Route path="/menu" element={<ProtectedRoute allowedRoles={['ADMIN']}><MenuPage /></ProtectedRoute>} />
             <Route path="/billing" element={<ProtectedRoute allowedRoles={['ADMIN', 'CASHIER']}><BillingPage /></ProtectedRoute>} />

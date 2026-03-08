@@ -145,7 +145,7 @@ export default function OrdersPage() {
                 )}
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/orders/${selectedOrder.id}`)}
+                  onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}`); }}
                 >
                   Full Details
                 </Button>
