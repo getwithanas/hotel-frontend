@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { menuService } from '@/services/menu.service';
 import { categoriesService } from '@/services/categories.service';
+import { settingsService } from '@/services/settings.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { MenuItemImage } from '@/components/common/MenuItemImage';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -19,7 +20,7 @@ import { motion } from 'framer-motion';
 import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
 
-const LOW_STOCK_THRESHOLD = 5;
+const DEFAULT_LOW_STOCK_THRESHOLD = 5;
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -49,6 +50,13 @@ export default function MenuPage() {
     queryKey: ['categories'],
     queryFn: () => categoriesService.list(),
   });
+
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: settingsService.get,
+  });
+
+  const LOW_STOCK_THRESHOLD = Number(settings?.lowStockThreshold) || DEFAULT_LOW_STOCK_THRESHOLD;
 
   const createItemMutation = useMutation({
     mutationFn: (data: FormData) => editingItem ? menuService.update(editingItem.id, data) : menuService.create(data),
