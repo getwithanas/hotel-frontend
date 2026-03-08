@@ -60,7 +60,11 @@ export function useSocket() {
     socket.on(SOCKET_EVENTS.ORDER_ITEM_UPDATED, (data?: { orderId?: number }) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
+      if (data?.orderId) {
+        queryClient.invalidateQueries({ queryKey: ['order', String(data.orderId)] });
+      }
       playSuccessSound();
+      toast.success(data?.orderId ? `Item ready in order #${data.orderId}` : 'An order item is ready', { duration: 4000 });
       addNotification({
         type: 'order_ready',
         title: 'Item Ready',
