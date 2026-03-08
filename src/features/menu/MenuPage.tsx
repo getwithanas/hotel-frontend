@@ -252,6 +252,13 @@ export default function MenuPage() {
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+                      {(item.spiceLevel ?? 0) > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive flex items-center gap-0.5">
+                          {Array.from({ length: item.spiceLevel! }).map((_, i) => (
+                            <Flame key={i} className="h-2.5 w-2.5" />
+                          ))}
+                        </span>
+                      )}
                       {(item.stock ?? 0) === 0 ? (
                         <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-destructive/10 text-destructive animate-pulse">
                           Out of Stock
