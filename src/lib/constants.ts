@@ -21,6 +21,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   READY: 'Ready',
   SERVED: 'Served',
   BILLED: 'Billed',
+  CANCELLED: 'Cancelled',
 };
 
 export const ORDER_STATUS_FLOW: OrderStatus[] = ['PENDING', 'PREPARING', 'READY', 'SERVED', 'BILLED'];
@@ -34,7 +35,8 @@ export const ITEM_STATUS_LABELS: Record<OrderItemStatus, string> = {
 
 export const DELIVERY_STATUS_LABELS: Record<DeliveryStatus, string> = {
   PENDING: 'Pending',
-  PICKED_UP: 'Picked Up',
+  ASSIGNED: 'Assigned',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
 };

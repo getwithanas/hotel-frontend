@@ -115,11 +115,11 @@ export default function KitchenDisplayPage() {
                       <StatusBadge status={item.status} className="text-[10px] px-1.5" />
                     </div>
                   ))}
-                  {order.items?.some(item => item.notes) && (
+                  {order.items?.some(item => item.note) && (
                     <div className="mt-2 space-y-1">
-                      {order.items.filter(i => i.notes).map(item => (
+                      {order.items.filter(i => i.note).map(item => (
                         <p key={item.id} className="text-xs text-warning bg-warning/5 px-2 py-1 rounded">
-                          📝 {item.menuItem?.name}: {item.notes}
+                          📝 {item.menuItem?.name}: {item.note}
                         </p>
                       ))}
                     </div>

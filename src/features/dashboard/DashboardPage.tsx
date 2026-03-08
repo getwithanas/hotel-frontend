@@ -27,9 +27,7 @@ export default function DashboardPage() {
   if (isLoading) return <LoadingSpinner size="lg" text="Loading dashboard..." />;
   if (!dashboard) return <EmptyState title="Unable to load dashboard" />;
 
-  const occupancyRate = dashboard.totalTables > 0
-    ? Math.round((dashboard.occupiedTables / dashboard.totalTables) * 100)
-    : 0;
+  const totalQueueCount = dashboard.liveQueue.pending + dashboard.liveQueue.preparing + dashboard.liveQueue.ready;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -42,14 +40,10 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Orders" value={dashboard.totalOrders} icon={ShoppingCart} />
-        <StatCard title="Revenue" value={`$${dashboard.totalRevenue.toFixed(2)}`} icon={DollarSign} />
-        <StatCard
-          title="Occupied Tables"
-          value={`${dashboard.occupiedTables}/${dashboard.totalTables}`}
-          icon={Table2}
-        />
-        <StatCard title="Occupancy Rate" value={`${occupancyRate}%`} icon={TrendingUp} />
+        <StatCard title="Total Orders" value={dashboard.today.totalOrders} icon={ShoppingCart} />
+        <StatCard title="Revenue" value={`$${dashboard.today.revenue}`} icon={DollarSign} />
+        <StatCard title="Occupied Tables" value={dashboard.today.occupiedTables} icon={Table2} />
+        <StatCard title="Live Queue" value={totalQueueCount} icon={TrendingUp} />
       </div>
 
       {/* Charts */}
@@ -60,9 +54,9 @@ export default function DashboardPage() {
             <BarChart3 className="h-4 w-4 text-primary" />
             Top Selling Items
           </h3>
-          {dashboard.topItems.length > 0 ? (
+          {dashboard.popularItems.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={dashboard.topItems} layout="vertical">
+              <BarChart data={dashboard.popularItems} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
                 <YAxis
@@ -79,7 +73,7 @@ export default function DashboardPage() {
                     fontSize: '12px',
                   }}
                 />
-                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="totalSold" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -87,15 +81,16 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Occupancy Pie */}
+        {/* Live Queue Breakdown */}
         <div className="glass-card p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Table Occupancy</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-4">Live Queue</h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={[
-                  { name: 'Occupied', value: dashboard.occupiedTables },
-                  { name: 'Free', value: dashboard.totalTables - dashboard.occupiedTables },
+                  { name: 'Pending', value: dashboard.liveQueue.pending },
+                  { name: 'Preparing', value: dashboard.liveQueue.preparing },
+                  { name: 'Ready', value: dashboard.liveQueue.ready },
                 ]}
                 cx="50%"
                 cy="50%"
@@ -104,8 +99,9 @@ export default function DashboardPage() {
                 dataKey="value"
                 stroke="none"
               >
-                <Cell fill="hsl(var(--status-occupied))" />
-                <Cell fill="hsl(var(--status-free))" />
+                <Cell fill="hsl(var(--status-pending))" />
+                <Cell fill="hsl(var(--status-preparing))" />
+                <Cell fill="hsl(var(--status-ready))" />
               </Pie>
               <Tooltip
                 contentStyle={{
@@ -119,12 +115,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Live Queue */}
+      {/* Recent Orders */}
       <div className="glass-card p-5">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Live Order Queue</h3>
-        {dashboard.liveQueue.length > 0 ? (
+        <h3 className="text-sm font-semibold text-foreground mb-4">Recent Orders</h3>
+        {dashboard.recentOrders.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {dashboard.liveQueue.map((order) => (
+            {dashboard.recentOrders.map((order) => (
               <OrderCard
                 key={order.id}
                 order={order}
@@ -133,7 +129,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : (
-          <EmptyState title="No active orders" description="Orders will appear here in real-time" className="py-8" />
+          <EmptyState title="No orders today" description="Orders will appear here in real-time" className="py-8" />
         )}
       </div>
     </div>

@@ -30,7 +30,7 @@ const STATUS_VARIANT_MAP: Record<string, keyof typeof badgeVariants extends neve
   FREE: 'free', OCCUPIED: 'occupied', RESERVED: 'reserved',
   PENDING: 'pending', PREPARING: 'preparing', READY: 'ready',
   SERVED: 'served', BILLED: 'billed', CANCELLED: 'cancelled',
-  PICKED_UP: 'preparing', DELIVERED: 'delivered',
+  PICKED_UP: 'preparing', ASSIGNED: 'preparing', OUT_FOR_DELIVERY: 'preparing', DELIVERED: 'delivered',
   ADMIN: 'admin', WAITER: 'waiter', KITCHEN: 'kitchen', CASHIER: 'cashier',
 };
 

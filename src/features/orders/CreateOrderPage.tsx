@@ -18,7 +18,7 @@ import type { MenuItem, OrderType, CreateOrderRequest } from '@/types';
 interface CartItem {
   menuItem: MenuItem;
   quantity: number;
-  notes: string;
+  note: string;
 }
 
 export default function CreateOrderPage() {
@@ -32,7 +32,7 @@ export default function CreateOrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
-  const [deliveryInfo, setDeliveryInfo] = useState({ customerName: '', customerPhone: '', address: '' });
+  const [deliveryInfo, setDeliveryInfo] = useState({ customerName: '', phone: '', address: '' });
 
   const { data: menuItems, isLoading: menuLoading } = useQuery({
     queryKey: ['menu'],
@@ -74,7 +74,7 @@ export default function CreateOrderPage() {
       if (existing) {
         return prev.map(c => c.menuItem.id === item.id ? { ...c, quantity: c.quantity + 1 } : c);
       }
-      return [...prev, { menuItem: item, quantity: 1, notes: '' }];
+      return [...prev, { menuItem: item, quantity: 1, note: '' }];
     });
   };
 
@@ -90,14 +90,14 @@ export default function CreateOrderPage() {
   const handleSubmit = () => {
     if (cart.length === 0) { toast.error('Add items to the order'); return; }
     if (orderType === 'DINE_IN' && !tableId) { toast.error('Select a table'); return; }
-    if (orderType === 'DELIVERY' && (!deliveryInfo.customerName || !deliveryInfo.customerPhone || !deliveryInfo.address)) {
+    if (orderType === 'DELIVERY' && (!deliveryInfo.customerName || !deliveryInfo.phone || !deliveryInfo.address)) {
       toast.error('Fill in delivery details'); return;
     }
 
     const data: CreateOrderRequest = {
       type: orderType,
       tableId: orderType === 'DINE_IN' ? parseInt(tableId) : undefined,
-      items: cart.map(c => ({ menuItemId: c.menuItem.id, quantity: c.quantity, notes: c.notes || undefined })),
+      items: cart.map(c => ({ menuItemId: c.menuItem.id, quantity: c.quantity, note: c.note || undefined })),
       delivery: orderType === 'DELIVERY' ? deliveryInfo : undefined,
     };
 
@@ -151,7 +151,7 @@ export default function CreateOrderPage() {
               <p className="text-sm font-semibold text-foreground">Delivery Details</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input placeholder="Customer Name" value={deliveryInfo.customerName} onChange={e => setDeliveryInfo(d => ({ ...d, customerName: e.target.value }))} />
-                <Input placeholder="Phone" value={deliveryInfo.customerPhone} onChange={e => setDeliveryInfo(d => ({ ...d, customerPhone: e.target.value }))} />
+                <Input placeholder="Phone" value={deliveryInfo.phone} onChange={e => setDeliveryInfo(d => ({ ...d, phone: e.target.value }))} />
               </div>
               <Textarea placeholder="Delivery Address" value={deliveryInfo.address} onChange={e => setDeliveryInfo(d => ({ ...d, address: e.target.value }))} />
             </div>

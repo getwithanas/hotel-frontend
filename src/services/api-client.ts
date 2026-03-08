@@ -18,9 +18,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor: error handling
+// Response interceptor: unwrap backend wrapper + error handling
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Backend wraps all responses in { success, message, data }
+    // Unwrap so services get the inner data directly
+    if (response.data && typeof response.data === 'object' && 'success' in response.data && 'data' in response.data) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     const status = error.response?.status;
     const message = error.response?.data?.message || error.message;

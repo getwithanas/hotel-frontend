@@ -41,7 +41,7 @@ export default function DeliveriesPage() {
       </div>
 
       <div className="filter-bar">
-        {['ALL', 'PENDING', 'PICKED_UP', 'DELIVERED', 'CANCELLED'].map(s => (
+        {['ALL', 'PENDING', 'ASSIGNED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'].map(s => (
           <Button key={s} variant={filter === s ? 'default' : 'outline'} size="sm" onClick={() => setFilter(s)}>
             {s === 'ALL' ? 'All' : DELIVERY_STATUS_LABELS[s as DeliveryStatus]}
           </Button>
@@ -67,7 +67,7 @@ export default function DeliveriesPage() {
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Phone className="h-3 w-3" />
-                  <span>{delivery.customerPhone}</span>
+                  <span>{delivery.phone}</span>
                 </div>
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <MapPin className="h-3 w-3 mt-0.5 shrink-0" />
@@ -77,16 +77,21 @@ export default function DeliveriesPage() {
 
               <div className="flex gap-2 pt-2 border-t border-border">
                 {delivery.status === 'PENDING' && (
-                  <Button size="sm" className="flex-1" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'PICKED_UP' })}>
-                    Mark Picked Up
+                  <Button size="sm" className="flex-1" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'ASSIGNED' })}>
+                    Mark Assigned
                   </Button>
                 )}
-                {delivery.status === 'PICKED_UP' && (
+                {delivery.status === 'ASSIGNED' && (
+                  <Button size="sm" className="flex-1" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'OUT_FOR_DELIVERY' })}>
+                    Out for Delivery
+                  </Button>
+                )}
+                {delivery.status === 'OUT_FOR_DELIVERY' && (
                   <Button size="sm" className="flex-1" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'DELIVERED' })}>
                     Mark Delivered
                   </Button>
                 )}
-                {(delivery.status === 'PENDING' || delivery.status === 'PICKED_UP') && (
+                {(delivery.status === 'PENDING' || delivery.status === 'ASSIGNED') && (
                   <Button size="sm" variant="outline" className="text-destructive" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'CANCELLED' })}>
                     Cancel
                   </Button>

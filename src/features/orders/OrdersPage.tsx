@@ -113,7 +113,7 @@ export default function OrdersPage() {
                     <div>
                       <span className="text-sm font-medium text-foreground">{item.menuItem?.name || `Item #${item.menuItemId}`}</span>
                       <span className="text-xs text-muted-foreground ml-2">×{item.quantity}</span>
-                      {item.notes && <p className="text-xs text-muted-foreground mt-0.5">{item.notes}</p>}
+                      {item.note && <p className="text-xs text-muted-foreground mt-0.5">{item.note}</p>}
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge status={item.status} />

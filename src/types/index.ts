@@ -1,16 +1,22 @@
 // ── Enums ──
 export type UserRole = 'ADMIN' | 'WAITER' | 'KITCHEN' | 'CASHIER';
 export type TableStatus = 'FREE' | 'OCCUPIED' | 'RESERVED';
-export type OrderStatus = 'PENDING' | 'PREPARING' | 'READY' | 'SERVED' | 'BILLED';
+export type OrderStatus = 'PENDING' | 'PREPARING' | 'READY' | 'SERVED' | 'BILLED' | 'CANCELLED';
 export type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY';
 export type OrderItemStatus = 'PENDING' | 'PREPARING' | 'READY' | 'SERVED';
 export type PaymentMethod = 'CASH' | 'CARD' | 'UPI' | 'OTHER';
-export type DeliveryStatus = 'PENDING' | 'PICKED_UP' | 'DELIVERED' | 'CANCELLED';
+export type DeliveryStatus = 'PENDING' | 'ASSIGNED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
 
 // ── Auth ──
 export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }
 
 export interface LoginResponse {
@@ -54,7 +60,7 @@ export interface UpdateUserRequest {
 // ── Table ──
 export interface RestaurantTable {
   id: number;
-  number: number;
+  number: string;
   capacity: number;
   status: TableStatus;
   location?: string;
@@ -63,7 +69,7 @@ export interface RestaurantTable {
 }
 
 export interface CreateTableRequest {
-  number: number;
+  number: string;
   capacity: number;
   location?: string;
 }
@@ -114,7 +120,7 @@ export interface OrderItem {
   menuItem?: MenuItem;
   quantity: number;
   price: number;
-  notes?: string;
+  note?: string;
   status: OrderItemStatus;
 }
 
@@ -137,10 +143,10 @@ export interface Order {
 export interface CreateOrderRequest {
   type: OrderType;
   tableId?: number;
-  items: { menuItemId: number; quantity: number; notes?: string }[];
+  items: { menuItemId: number; quantity: number; note?: string }[];
   delivery?: {
     customerName: string;
-    customerPhone: string;
+    phone: string;
     address: string;
   };
 }
@@ -175,7 +181,7 @@ export interface Delivery {
   orderId: number;
   order?: Order;
   customerName: string;
-  customerPhone: string;
+  phone: string;
   address: string;
   status: DeliveryStatus;
   deliveredAt?: string;
@@ -184,12 +190,18 @@ export interface Delivery {
 
 // ── Reports ──
 export interface DashboardData {
-  totalOrders: number;
-  totalRevenue: number;
-  occupiedTables: number;
-  totalTables: number;
-  topItems: { name: string; count: number }[];
-  liveQueue: Order[];
+  today: {
+    totalOrders: number;
+    revenue: string;
+    occupiedTables: number;
+  };
+  liveQueue: {
+    pending: number;
+    preparing: number;
+    ready: number;
+  };
+  popularItems: { menuItemId: number; name: string; totalSold: number }[];
+  recentOrders: (Order & { _count?: { items: number } })[];
 }
 
 export interface DailyReport {
