@@ -4,13 +4,16 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Sun, Moon, Monitor } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTheme } from '@/hooks/use-theme';
 import type { Settings } from '@/types';
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
+  const { theme, setTheme } = useTheme();
   const [form, setForm] = useState<Record<string, string>>({});
 
   const { data: settings, isLoading } = useQuery({
@@ -73,6 +76,32 @@ export default function SettingsPage() {
         <Button onClick={() => mutation.mutate(form as any)} disabled={mutation.isPending}>
           <Save className="h-4 w-4 mr-1" /> Save Settings
         </Button>
+      </div>
+
+      {/* Appearance */}
+      <div className="glass-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Appearance</h2>
+        <div className="space-y-2">
+          <Label>Theme</Label>
+          <div className="flex gap-2">
+            {([
+              { value: 'light', icon: Sun, label: 'Light' },
+              { value: 'dark', icon: Moon, label: 'Dark' },
+              { value: 'system', icon: Monitor, label: 'System' },
+            ] as const).map(({ value, icon: Icon, label }) => (
+              <Button
+                key={value}
+                variant={theme === value ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTheme(value)}
+                className="flex items-center gap-1.5"
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
