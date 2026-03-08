@@ -376,6 +376,29 @@ export default function MenuPage() {
                 <Label>Vegetarian</Label>
               </div>
               <div className="space-y-2">
+                <Label>Spice Level</Label>
+                <div className="flex items-center gap-1">
+                  {[0, 1, 2, 3, 4, 5].map(level => (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => setItemForm(f => ({ ...f, spiceLevel: level.toString() }))}
+                      className={cn(
+                        'h-8 w-8 rounded-md flex items-center justify-center text-xs font-medium transition-colors border',
+                        Number(itemForm.spiceLevel) >= level && level > 0
+                          ? 'bg-destructive/15 border-destructive/30 text-destructive'
+                          : 'bg-muted border-border text-muted-foreground hover:bg-muted/80'
+                      )}
+                      title={level === 0 ? 'No spice' : `Level ${level}`}
+                    >
+                      {level === 0 ? '0' : <Flame className="h-3.5 w-3.5" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label>Stock</Label>
                 <Input type="number" min="0" value={itemForm.stock} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" />
               </div>
