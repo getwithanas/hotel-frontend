@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Minus, Plus, ShoppingCart, Trash2, ArrowLeft, Search, Leaf, ImageIcon, MapPin, Phone, User, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn, fmt } from '@/lib/utils';
+import { cn, fmt, imgUrl } from '@/lib/utils';
 import type { MenuItem, OrderType, CreateOrderRequest } from '@/types';
 
 interface CartItem {
