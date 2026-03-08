@@ -37,7 +37,7 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '' });
+  const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false, stock: '', spiceLevel: '0' });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
 
