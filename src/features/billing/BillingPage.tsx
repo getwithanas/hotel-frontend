@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { Receipt, Plus, Printer } from 'lucide-react';
 import { PAYMENT_METHODS } from '@/lib/constants';
 import { printBill } from '@/lib/print-utils';
+import { motion } from 'framer-motion';
 import type { Bill, PaymentMethod } from '@/types';
 
 export default function BillingPage() {
@@ -78,7 +79,6 @@ export default function BillingPage() {
         date: fullBill.createdAt,
       });
     } catch {
-      // Fallback: print with available data
       printBill({
         billId: bill.id,
         orderId: bill.orderId,
@@ -98,18 +98,22 @@ export default function BillingPage() {
   if (isLoading) return <LoadingSpinner size="lg" />;
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">Billing</h1>
-          <p className="page-subtitle">{bills?.length || 0} bills</p>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-success/15">
+            <Receipt className="h-5 w-5 text-success" />
+          </div>
+          <div>
+            <h1 className="page-title">Billing</h1>
+            <p className="page-subtitle">{bills?.length || 0} bills</p>
+          </div>
         </div>
         <Button onClick={() => setShowGenerateDialog(true)} disabled={!servedOrders?.length}>
           <Plus className="h-4 w-4 mr-1" /> Generate Bill
         </Button>
       </div>
 
-      {/* Filter */}
       <div className="filter-bar">
         <div className="space-y-1">
           <Label className="text-xs">Date</Label>
@@ -117,14 +121,24 @@ export default function BillingPage() {
         </div>
       </div>
 
-      {/* Bills list */}
       {bills && bills.length > 0 ? (
-        <div className="space-y-3">
+        <motion.div
+          className="space-y-2"
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.04 } } }}
+        >
           {bills.map(bill => (
-            <div key={bill.id} className="glass-card p-4 flex items-center justify-between">
+            <motion.div
+              key={bill.id}
+              className="bg-card border border-border rounded-xl p-4 flex items-center justify-between"
+              style={{ boxShadow: 'var(--shadow-sm)' }}
+              variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+              whileHover={{ x: 2 }}
+            >
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
-                  <Receipt className="h-5 w-5 text-primary" />
+                <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-success/10">
+                  <Receipt className="h-5 w-5 text-success" />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Bill #{bill.id}</p>
@@ -132,7 +146,7 @@ export default function BillingPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-right">
+                <div className="text-right hidden sm:block">
                   <p className="text-xs text-muted-foreground">Subtotal: ${bill.subtotal.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">Tax: ${bill.taxAmount.toFixed(2)} ({bill.taxRate}%)</p>
                   {bill.discount > 0 && <p className="text-xs text-success">Discount: -${bill.discount.toFixed(2)}</p>}
@@ -145,14 +159,13 @@ export default function BillingPage() {
                   <Printer className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       ) : (
         <EmptyState icon={Receipt} title="No bills found" />
       )}
 
-      {/* Generate Bill Dialog */}
       <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
         <DialogContent>
           <DialogHeader>

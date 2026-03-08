@@ -13,6 +13,8 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Plus, Users, Edit, Trash2 } from 'lucide-react';
 import { ROLE_LABELS } from '@/lib/constants';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import type { User, UserRole, CreateUserRequest } from '@/types';
 
 export default function StaffPage() {
@@ -63,11 +65,16 @@ export default function StaffPage() {
   if (isLoading) return <LoadingSpinner size="lg" />;
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">Staff Management</h1>
-          <p className="page-subtitle">{users?.length || 0} staff members</p>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary/10">
+            <Users className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="page-title">Staff Management</h1>
+            <p className="page-subtitle">{users?.length || 0} staff members</p>
+          </div>
         </div>
         <Button onClick={() => openDialog()}>
           <Plus className="h-4 w-4 mr-1" /> Add Staff
@@ -83,11 +90,25 @@ export default function StaffPage() {
       </div>
 
       {users && users.length > 0 ? (
-        <div className="space-y-3">
+        <motion.div
+          className="space-y-2"
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.04 } } }}
+        >
           {users.map(user => (
-            <div key={user.id} className="glass-card p-4 flex items-center justify-between">
+            <motion.div
+              key={user.id}
+              className="bg-card border border-border rounded-xl p-4 flex items-center justify-between"
+              style={{ boxShadow: 'var(--shadow-sm)' }}
+              variants={{ hidden: { opacity: 0, x: -8 }, show: { opacity: 1, x: 0 } }}
+              whileHover={{ x: 2 }}
+            >
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                <div className={cn(
+                  'flex items-center justify-center h-10 w-10 rounded-full font-semibold text-sm',
+                  user.active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                )}>
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -97,19 +118,22 @@ export default function StaffPage() {
               </div>
               <div className="flex items-center gap-3">
                 <StatusBadge status={user.role} label={ROLE_LABELS[user.role]} />
-                <span className={`text-xs px-2 py-0.5 rounded-full ${user.active ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'}`}>
+                <span className={cn(
+                  'text-xs px-2 py-0.5 rounded-full font-medium',
+                  user.active ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'
+                )}>
                   {user.active ? 'Active' : 'Inactive'}
                 </span>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openDialog(user)}>
                   <Edit className="h-3 w-3" />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteMutation.mutate(user.id)}>
+                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteMutation.mutate(user.id)}>
                   <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       ) : (
         <EmptyState icon={Users} title="No staff found" action={{ label: 'Add Staff', onClick: () => openDialog() }} />
       )}

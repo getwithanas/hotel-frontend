@@ -5,11 +5,17 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DELIVERY_STATUS_LABELS } from '@/lib/constants';
 import { toast } from 'sonner';
 import { Truck, MapPin, Phone, User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import type { DeliveryStatus } from '@/types';
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0 },
+};
 
 export default function DeliveriesPage() {
   const queryClient = useQueryClient();
@@ -32,11 +38,16 @@ export default function DeliveriesPage() {
   if (isLoading) return <LoadingSpinner size="lg" />;
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">Deliveries</h1>
-          <p className="page-subtitle">{deliveries?.length || 0} deliveries</p>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-info/15">
+            <Truck className="h-5 w-5 text-info" />
+          </div>
+          <div>
+            <h1 className="page-title">Deliveries</h1>
+            <p className="page-subtitle">{deliveries?.length || 0} deliveries</p>
+          </div>
         </div>
       </div>
 
@@ -49,33 +60,48 @@ export default function DeliveriesPage() {
       </div>
 
       {deliveries && deliveries.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+        >
           {deliveries.map(delivery => (
-            <div key={delivery.id} className="glass-card p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-semibold text-foreground">Order #{delivery.orderId}</span>
+            <motion.div
+              key={delivery.id}
+              className="bg-card border border-border rounded-xl overflow-hidden"
+              style={{ boxShadow: 'var(--shadow-sm)' }}
+              variants={cardVariants}
+              whileHover={{ y: -2 }}
+            >
+              <div className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-muted">
+                      <Truck className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <span className="font-bold text-foreground">Order #{delivery.orderId}</span>
+                  </div>
+                  <StatusBadge status={delivery.status} label={DELIVERY_STATUS_LABELS[delivery.status]} dot />
                 </div>
-                <StatusBadge status={delivery.status} label={DELIVERY_STATUS_LABELS[delivery.status]} dot />
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2.5 text-foreground">
+                    <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="font-medium">{delivery.customerName}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-muted-foreground">
+                    <Phone className="h-3.5 w-3.5 shrink-0" />
+                    <span>{delivery.phone}</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    <span className="text-xs leading-relaxed">{delivery.address}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-1.5 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <User className="h-3 w-3" />
-                  <span>{delivery.customerName}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="h-3 w-3" />
-                  <span>{delivery.phone}</span>
-                </div>
-                <div className="flex items-start gap-2 text-muted-foreground">
-                  <MapPin className="h-3 w-3 mt-0.5 shrink-0" />
-                  <span className="text-xs">{delivery.address}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-2 border-t border-border">
+              <div className="flex gap-2 p-4 border-t border-border bg-muted/20">
                 {delivery.status === 'PENDING' && (
                   <Button size="sm" className="flex-1" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'ASSIGNED' })}>
                     Mark Assigned
@@ -87,19 +113,19 @@ export default function DeliveriesPage() {
                   </Button>
                 )}
                 {delivery.status === 'OUT_FOR_DELIVERY' && (
-                  <Button size="sm" className="flex-1" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'DELIVERED' })}>
+                  <Button size="sm" className="flex-1 bg-success hover:bg-success/90 text-success-foreground" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'DELIVERED' })}>
                     Mark Delivered
                   </Button>
                 )}
                 {(delivery.status === 'PENDING' || delivery.status === 'ASSIGNED') && (
-                  <Button size="sm" variant="outline" className="text-destructive" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'CANCELLED' })}>
+                  <Button size="sm" variant="outline" className="text-destructive hover:text-destructive" onClick={() => statusMutation.mutate({ id: delivery.id, status: 'CANCELLED' })}>
                     Cancel
                   </Button>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       ) : (
         <EmptyState icon={Truck} title="No deliveries" description="Delivery orders will appear here" />
       )}

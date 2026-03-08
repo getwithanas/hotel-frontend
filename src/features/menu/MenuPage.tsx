@@ -13,8 +13,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Search, UtensilsCrossed, Edit, Trash2, Image } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, Edit, Trash2, Leaf, ImageIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import type { MenuItem, Category } from '@/types';
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0 },
+};
 
 export default function MenuPage() {
   const queryClient = useQueryClient();
@@ -25,7 +32,6 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  // Form state
   const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', categoryId: '', isVeg: false });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
@@ -117,20 +123,28 @@ export default function MenuPage() {
   if (menuLoading) return <LoadingSpinner size="lg" />;
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4">
       <div className="page-header">
-        <h1 className="page-title">Menu Management</h1>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary/10">
+            <UtensilsCrossed className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="page-title">Menu Management</h1>
+            <p className="page-subtitle">{menuItems?.length || 0} items across {categories?.length || 0} categories</p>
+          </div>
+        </div>
       </div>
 
       <Tabs defaultValue="items">
-        <TabsList>
+        <TabsList className="bg-muted/50">
           <TabsTrigger value="items">Menu Items</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
         </TabsList>
 
         <TabsContent value="items" className="space-y-4 mt-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="filter-bar flex-1">
+            <div className="flex items-center gap-3 flex-1 flex-wrap">
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Search items..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
@@ -138,7 +152,7 @@ export default function MenuPage() {
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-[150px]"><SelectValue placeholder="Category" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALL">All</SelectItem>
+                  <SelectItem value="ALL">All Categories</SelectItem>
                   {categories?.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -149,45 +163,72 @@ export default function MenuPage() {
           </div>
 
           {filteredItems.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              initial="hidden"
+              animate="show"
+              variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+            >
               {filteredItems.map(item => (
-                <div key={item.id} className="glass-card overflow-hidden">
-                  {item.image && (
-                    <div className="h-36 bg-muted flex items-center justify-center overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                  )}
+                <motion.div
+                  key={item.id}
+                  className="bg-card border border-border rounded-xl overflow-hidden group"
+                  style={{ boxShadow: 'var(--shadow-sm)' }}
+                  variants={cardVariants}
+                  whileHover={{ y: -3, boxShadow: '0 8px 20px -8px hsl(var(--primary) / 0.1)' }}
+                >
+                  {/* Image */}
+                  <div className="h-36 bg-muted/50 flex items-center justify-center overflow-hidden relative">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                      <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                    )}
+                    {/* Veg badge overlay */}
+                    {item.isVeg && (
+                      <span className="absolute top-2 left-2 flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md bg-success/90 text-success-foreground font-medium">
+                        <Leaf className="h-2.5 w-2.5" /> VEG
+                      </span>
+                    )}
+                    {/* Availability overlay */}
+                    {!item.available && (
+                      <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
+                        <span className="text-xs font-semibold text-muted-foreground bg-background/80 px-3 py-1 rounded-full">Unavailable</span>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="p-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-semibold text-foreground text-sm">{item.name}</h4>
-                      {item.isVeg && <span className="text-[10px] px-1.5 py-0.5 rounded bg-success/15 text-success font-medium">VEG</span>}
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h4 className="font-semibold text-foreground text-sm leading-tight">{item.name}</h4>
+                      <span className="font-bold text-primary text-sm whitespace-nowrap">${item.price.toFixed(2)}</span>
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>}
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-foreground">${item.price.toFixed(2)}</span>
-                      <span className="text-xs text-muted-foreground">{item.category?.name}</span>
-                    </div>
+                    <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{item.category?.name}</span>
+
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                       <div className="flex items-center gap-2">
                         <Switch
                           checked={item.available}
                           onCheckedChange={() => toggleMutation.mutate(item.id)}
                         />
-                        <span className="text-xs text-muted-foreground">{item.available ? 'Available' : 'Unavailable'}</span>
+                        <span className={cn('text-xs', item.available ? 'text-success' : 'text-muted-foreground')}>
+                          {item.available ? 'Available' : 'Off'}
+                        </span>
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex gap-0.5">
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openItemDialog(item)}>
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteItemMutation.mutate(item.id)}>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteItemMutation.mutate(item.id)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
             <EmptyState icon={UtensilsCrossed} title="No menu items" action={{ label: 'Add Item', onClick: () => openItemDialog() }} />
           )}
@@ -200,27 +241,38 @@ export default function MenuPage() {
             </Button>
           </div>
           {categories && categories.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              initial="hidden"
+              animate="show"
+              variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+            >
               {categories.map(cat => (
-                <div key={cat.id} className="glass-card p-4 flex items-center justify-between">
+                <motion.div
+                  key={cat.id}
+                  className="bg-card border border-border rounded-xl p-4 flex items-center justify-between"
+                  style={{ boxShadow: 'var(--shadow-sm)' }}
+                  variants={cardVariants}
+                  whileHover={{ y: -2 }}
+                >
                   <div>
                     <h4 className="font-semibold text-foreground">{cat.name}</h4>
-                    {cat.description && <p className="text-xs text-muted-foreground">{cat.description}</p>}
-                    <span className="text-xs text-muted-foreground">{cat.itemCount || 0} items</span>
+                    {cat.description && <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>}
+                    <span className="text-xs text-muted-foreground mt-1 inline-block">{cat.itemCount || 0} items</span>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => {
                       setEditingCategory(cat);
                       setCategoryForm({ name: cat.name, description: cat.description || '' });
                       setShowCategoryDialog(true);
                     }}><Edit className="h-3 w-3" /></Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteCategoryMutation.mutate(cat.id)}>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteCategoryMutation.mutate(cat.id)}>
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
             <EmptyState title="No categories" action={{ label: 'Add Category', onClick: () => setShowCategoryDialog(true) }} />
           )}
