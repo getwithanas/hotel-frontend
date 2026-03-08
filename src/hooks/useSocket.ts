@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { connectSocket, disconnectSocket, joinRoom, SOCKET_EVENTS } from '@/sockets/socket-client';
 import { useAuthStore } from '@/store/auth-store';
+import { playNewOrderSound, playSuccessSound } from '@/lib/notification-sound';
 
 export function useSocket() {
   const { token, user } = useAuthStore();
@@ -16,7 +17,6 @@ export function useSocket() {
     connectedRef.current = true;
 
     socket.on('connect', () => {
-      // Join role-based room
       joinRoom(user.role.toLowerCase());
     });
 
@@ -26,6 +26,12 @@ export function useSocket() {
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+
+      // Play sound for kitchen & waiter roles
+      if (user.role === 'KITCHEN' || user.role === 'ADMIN') {
+        playNewOrderSound();
+      }
+
       const tableInfo = data.tableNumber ? ` — Table ${data.tableNumber}` : '';
       toast.info(`New order #${data.id}${tableInfo}`, { duration: 5000 });
     });
@@ -39,6 +45,7 @@ export function useSocket() {
     socket.on(SOCKET_EVENTS.ORDER_ITEM_UPDATED, () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
+      playSuccessSound();
     });
 
     socket.on(SOCKET_EVENTS.TABLE_UPDATED, () => {
@@ -49,6 +56,7 @@ export function useSocket() {
       queryClient.invalidateQueries({ queryKey: ['bills'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      playSuccessSound();
       toast.success('Bill generated');
     });
 
