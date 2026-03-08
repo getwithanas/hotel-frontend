@@ -17,6 +17,7 @@ import { PAYMENT_METHODS } from '@/lib/constants';
 import { printBill } from '@/lib/print-utils';
 import { motion } from 'framer-motion';
 import type { Bill, PaymentMethod } from '@/types';
+import { fmt } from '@/lib/utils';
 
 export default function BillingPage() {
   const queryClient = useQueryClient();
