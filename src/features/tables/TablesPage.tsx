@@ -169,7 +169,7 @@ export default function TablesPage() {
                     <div
                       key={order.id}
                       className="flex items-center justify-between p-3 rounded-lg bg-muted cursor-pointer hover:bg-accent"
-                      onClick={() => navigate(`/orders/${order.id}`)}
+                      onClick={() => navigate('/orders')}
                     >
                       <span className="text-sm font-medium">Order #{order.id}</span>
                       <StatusBadge status={order.status} />
