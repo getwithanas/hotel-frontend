@@ -7,6 +7,7 @@ import { categoriesService } from '@/services/categories.service';
 import { ordersService } from '@/services/orders.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
+import { MenuItemImage } from '@/components/common/MenuItemImage';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
