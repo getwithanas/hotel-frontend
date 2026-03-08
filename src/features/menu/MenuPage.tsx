@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { menuService } from '@/services/menu.service';
 import { categoriesService } from '@/services/categories.service';
+import { settingsService } from '@/services/settings.service';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { MenuItemImage } from '@/components/common/MenuItemImage';
 import { EmptyState } from '@/components/common/EmptyState';
