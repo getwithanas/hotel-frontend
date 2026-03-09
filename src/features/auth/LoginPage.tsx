@@ -134,24 +134,6 @@ export default function LoginPage() {
             </motion.div>
           </div>
 
-          {/* Bottom stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.9 }}
-            className="flex items-center gap-8"
-          >
-            {[
-              { value: '99.9%', label: 'Uptime' },
-              { value: '<200ms', label: 'Response' },
-              { value: '24/7', label: 'Support' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <div className="text-base font-bold text-primary-foreground">{stat.value}</div>
-                <div className="text-[10px] text-primary-foreground/30 uppercase tracking-widest mt-0.5">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
         </div>
       </div>
 
